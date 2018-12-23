@@ -1,5 +1,6 @@
 #include "deleteuserdialog.h"
 #include "ui_deleteuserdialog.h"
+#include <QMessageBox>
 
 DeleteUserDialog::DeleteUserDialog(QWidget *parent,FtpSqlConnection *sqlConnection,int id,QString username) :
     QDialog(parent),
@@ -20,7 +21,16 @@ DeleteUserDialog::~DeleteUserDialog()
 }
 
 void DeleteUserDialog::confirm(){
-
+    if(sqlConnection->hasUserByName(username)){
+        if(!sqlConnection->deleteUserById(id)){
+            QMessageBox::warning(this,"错误","删除失败！");
+        }else{
+            emit refresh();
+        }
+    }else{
+        QMessageBox::warning(this,"错误","删除失败！");
+    }
+    this->close();
 }
 
 void DeleteUserDialog::cancel(){

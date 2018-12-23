@@ -50,8 +50,8 @@ private slots:
     void newGroup();
     void editGroup();
     void deleteGroup();
-    void refresh_user_list();
-    void refresh_group_list();
+    void refresh_user();
+    void refresh_group();
     void user_list_item_click(const QModelIndex&);
     void group_list_item_click(const QPoint&);
     void edit_or_save_access();
