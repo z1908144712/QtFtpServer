@@ -41,8 +41,7 @@ SOURCES += main.cpp\
     newuserdialog.cpp \
     ftpabout.cpp \
     ftpcrypto.cpp \
-    deleteuserdialog.cpp \
-    test.cpp
+    deleteuserdialog.cpp
 
 HEADERS  += mainwindow.h \
     ftpcommand.h \
@@ -61,8 +60,7 @@ HEADERS  += mainwindow.h \
     newuserdialog.h \
     ftpabout.h \
     ftpcrypto.h \
-    deleteuserdialog.h \
-    test.h
+    deleteuserdialog.h
 
 FORMS    += mainwindow.ui \
     setusergroupwindow.ui \
