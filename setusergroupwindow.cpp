@@ -229,7 +229,7 @@ void SetUserGroupWindow::refresh_user(){
     ui->dir_rename->setCheckState(Qt::Unchecked);
     ui->dir_no_access->setCheckState(Qt::Unchecked);
     ui->edit_access->setEnabled(false);
-    ui->edit_access->setText("编辑技能");
+    ui->edit_access->setText("编辑权限");
     edit_or_save=false;
 }
 
