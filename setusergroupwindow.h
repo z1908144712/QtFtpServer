@@ -53,7 +53,7 @@ private slots:
     void refresh_user();
     void refresh_group();
     void user_list_item_click(const QModelIndex&);
-    void group_list_item_click(const QPoint&);
+    void group_list_item_click(const QModelIndex&);
     void edit_or_save_access();
     void file_access_click();
     void file_no_access_click();

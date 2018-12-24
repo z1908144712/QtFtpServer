@@ -201,7 +201,7 @@ void SetUserGroupWindow::showGroupList(){
 /*
  * group_list item 点击
 */
-void SetUserGroupWindow::group_list_item_click(const QPoint &point){
+void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
 }
 
