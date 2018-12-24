@@ -70,5 +70,3 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     res.qrc
-
-CONFIG += c++11
