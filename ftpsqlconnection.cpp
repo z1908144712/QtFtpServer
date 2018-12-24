@@ -201,7 +201,7 @@ int FtpSqlConnection::queryGroupIdByName(QString name){
     QString sql="select id from ftpgroup where name=:name;";
     QSqlQuery sqlQuery;
     sqlQuery.prepare(sql);
-    sqlQuery.bindValue(":id",name);
+    sqlQuery.bindValue(":name",name);
     if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
         return 0;

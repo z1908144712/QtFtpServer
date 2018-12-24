@@ -201,21 +201,42 @@ void SetUserGroupWindow::showGroupList(){
 /*
  * group_list item 点击
 */
-void SetUserGroupWindow::group_list_item_click(const QPoint &point){
+void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
 }
 
 /*
- * 刷新user_list
+ * user操作后刷新必要控件
 */
-void SetUserGroupWindow::refresh_user_list(){
+void SetUserGroupWindow::refresh_user(){
     showUserList();
+    ui->edit_user->setEnabled(false);
+    ui->delete_user->setEnabled(false);
+    ui->groupBox_info->setEnabled(false);
+    ui->id_value->setText("");
+    ui->name_value->setText("");
+    ui->group_value->setText("");
+    ui->path_value->setText("");
+    ui->file_access->setEnabled(false);
+    ui->dir_access->setEnabled(false);
+    ui->file_delete->setCheckState(Qt::Unchecked);
+    ui->file_upload->setCheckState(Qt::Unchecked);
+    ui->file_rename->setCheckState(Qt::Unchecked);
+    ui->file_download->setCheckState(Qt::Unchecked);
+    ui->file_no_access->setCheckState(Qt::Unchecked);
+    ui->dir_delete->setCheckState(Qt::Unchecked);
+    ui->dir_new->setCheckState(Qt::Unchecked);
+    ui->dir_rename->setCheckState(Qt::Unchecked);
+    ui->dir_no_access->setCheckState(Qt::Unchecked);
+    ui->edit_access->setEnabled(false);
+    ui->edit_access->setText("编辑权限");
+    edit_or_save=false;
 }
 
 /*
- * 刷新group_list
+ * group操作后刷新必要控件
 */
-void SetUserGroupWindow::refresh_group_list(){
+void SetUserGroupWindow::refresh_group(){
     showGroupList();
 }
 
@@ -241,7 +262,7 @@ void SetUserGroupWindow::edit_or_save_access(){
 */
 void SetUserGroupWindow::newUser(){
     newUserDialog=new NewUserDialog(this,sqlConnection);
-    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));
+    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));
     newUserDialog->exec();
 }
 
@@ -257,6 +278,7 @@ void SetUserGroupWindow::editUser(){
 */
 void SetUserGroupWindow::deleteUser(){
     deleteUserDialog=new DeleteUserDialog(this,sqlConnection,ftpUser.getId(),ftpUser.getName());
+    connect(deleteUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));
     deleteUserDialog->exec();
 }
 

@@ -24,6 +24,8 @@ private:
 private slots:
     void confirm();
     void cancel();
+signals:
+    void refresh();
 };
 
 #endif // DELETEUSERDIALOG_H
