@@ -136,9 +136,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QLabel" name="label_id">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="text">
              <string>用户ID</string>
             </property>
@@ -146,9 +143,6 @@
           </item>
           <item>
            <widget class="QLineEdit" name="id_value">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

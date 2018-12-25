@@ -84,9 +84,6 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
 
     //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);
-    ui->id_value->setVisible(true);//为何是灰色状态
-    ui->label_id->setVisible(true);
-
 
     ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
     ui->file_access->setEnabled(false);
@@ -222,35 +219,35 @@ void SetUserGroupWindow::showGroupList(){
 void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
     //编辑用户和删除用户的按钮可见
-  ui->edit_group->setEnabled(true);
-  ui->delete_group->setEnabled(true);
+    ui->edit_group->setEnabled(true);
+    ui->delete_group->setEnabled(true);
 
-     //使右边第一个菜单栏可见
-     ui->groupBox_info->setEnabled(true);
+    //使右边第一个菜单栏可见
+    ui->groupBox_info->setEnabled(true);
 
-     ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
-     ui->file_access->setEnabled(false);
-     ui->dir_access->setEnabled(false);
-     ui->edit_access->setText("编辑权限");
-     //创建一个当前选中的用户组对象
-     ftpGroup=sqlConnection->queryGroupByName(index.data().toString());
-     //设置右边的第一个菜单栏的显示
-     ui->label_id->setText("用户组ID");
-     ui->label_name->setText("用户组名");
-     ui->label_group->setText("组员个数");
-     ui->label_path->setText("根目录");
+    ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
+    ui->file_access->setEnabled(false);
+    ui->dir_access->setEnabled(false);
+    ui->edit_access->setText("编辑权限");
+    //创建一个当前选中的用户组对象
+    ftpGroup=sqlConnection->queryGroupByName(index.data().toString());
+    //设置右边的第一个菜单栏的显示
+    ui->label_id->setText("用户组ID");
+    ui->label_name->setText("用户组名");
+    ui->label_group->setText("组员个数");
+    ui->label_path->setText("根目录");
 
-     //为其赋值
-     ui->id_value->setText(QString::number(ftpGroup.getId()));
-     ui->name_value->setText(ftpGroup.getName());
-     ui->group_value->setText( QString::number(ftpGroup.getCount()));
-     ui->path_value->setText(ftpGroup.getPath());
+    //为其赋值
+    ui->id_value->setText(QString::number(ftpGroup.getId()));
+    ui->name_value->setText(ftpGroup.getName());
+    ui->group_value->setText( QString::number(ftpGroup.getCount()));
+    ui->path_value->setText(ftpGroup.getPath());
 }
 
 /*
  * 刷新user_list
 */
-void SetUserGroupWindow::refresh_user_list(){
+void SetUserGroupWindow::refresh_user(){
     showUserList();
     ui->edit_user->setEnabled(false);
     ui->delete_user->setEnabled(false);
@@ -313,7 +310,7 @@ void SetUserGroupWindow::newUser(){
 */
 void SetUserGroupWindow::editUser(){
     editUserDialog=new EditUserDialog(this,sqlConnection,ftpUser);
-    connect(editUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));//接收到更新信号后就更新列表
+    connect(editUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));//接收到更新信号后就更新列表
     editUserDialog->exec();
 }
 
@@ -340,7 +337,7 @@ void SetUserGroupWindow::newGroup(){
 */
 void SetUserGroupWindow::editGroup(){
     editGroupDialog=new EditGroupDialog(this,sqlConnection,ftpGroup);
-    connect(editGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+    connect(editGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
     editGroupDialog->exec();
 }
 
@@ -349,6 +346,6 @@ void SetUserGroupWindow::editGroup(){
 */
 void SetUserGroupWindow::deleteGroup(){
     deleteGroupDialog=new DeleteGroupDialog(this,sqlConnection,ftpGroup.getId(),ftpGroup.getName());
-    connect(deleteGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+    connect(deleteGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
     deleteGroupDialog->exec();
 }
