@@ -88,17 +88,29 @@
           <property name="text">
            <string>新建用户组</string>
           </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="edit_group">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>编辑用户组</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="delete_group">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>删除用户组</string>
           </property>
@@ -124,6 +136,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QLabel" name="label_id">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>用户ID</string>
             </property>
@@ -131,6 +146,9 @@
           </item>
           <item>
            <widget class="QLineEdit" name="id_value">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

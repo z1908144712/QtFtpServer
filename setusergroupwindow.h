@@ -5,7 +5,11 @@
 #include <QDialog>
 #include <QPoint>
 #include "newuserdialog.h"
+#include "newgroupdialog.h"
+#include "edituserdialog.h"
+#include "editgroupdialog.h"
 #include "deleteuserdialog.h"
+#include "deletegroupdialog.h"
 #include "ftpsqlconnection.h"
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -29,7 +33,11 @@ private:
 
     Ui::SetUserGroupWindow *ui;
     NewUserDialog *newUserDialog;
+    NewGroupDialog *newGroupDialog;
     DeleteUserDialog *deleteUserDialog;
+    DeleteGroupDialog *deleteGroupDialog;
+    EditGroupDialog *editGroupDialog;
+    EditUserDialog *editUserDialog;
     FtpSqlConnection *sqlConnection;
     QStandardItemModel *group_standardItemModel;
     QStandardItemModel *user_standardItemModel;
@@ -41,7 +49,7 @@ private:
     void setFileAccess(QString file);
     void setDirectoryAcccess(QString directorty);
 
-    bool edit_or_save;
+    bool edit_or_save;//保存还是编辑
 
 private slots:
     void newUser();
@@ -53,7 +61,7 @@ private slots:
     void refresh_user_list();
     void refresh_group_list();
     void user_list_item_click(const QModelIndex&);
-    void group_list_item_click(const QPoint&);
+    void group_list_item_click(const QModelIndex &);
     void edit_or_save_access();
     void file_access_click();
     void file_no_access_click();

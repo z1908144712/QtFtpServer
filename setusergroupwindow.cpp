@@ -39,8 +39,11 @@ void SetUserGroupWindow::init_data(){
 */
 void SetUserGroupWindow::init_connect(){
     connect(ui->new_user,SIGNAL(clicked()),this,SLOT(newUser()));
+    connect(ui->new_group,SIGNAL(clicked()),this,SLOT(newGroup()));
     connect(ui->edit_user,SIGNAL(clicked()),this,SLOT(editUser()));
+    connect(ui->edit_group,SIGNAL(clicked()),this,SLOT(editGroup()));
     connect(ui->delete_user,SIGNAL(clicked()),this,SLOT(deleteUser()));
+    connect(ui->delete_group,SIGNAL(clicked()),this,SLOT(deleteGroup()));
     connect(ui->edit_access,SIGNAL(clicked()),this,SLOT(edit_or_save_access()));
     connect(ui->file_delete,SIGNAL(clicked()),this,SLOT(file_access_click()));
     connect(ui->file_upload,SIGNAL(clicked()),this,SLOT(file_access_click()));
@@ -51,7 +54,11 @@ void SetUserGroupWindow::init_connect(){
     connect(ui->dir_new,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_rename,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_no_access,SIGNAL(clicked()),this,SLOT(dir_no_access_click()));
+
+    //点击用户列表的信号与槽
     connect(ui->user_list,SIGNAL(clicked(const QModelIndex&)),this,SLOT(user_list_item_click(const QModelIndex&)));
+    //点击用户组列表的信号与槽
+    connect(ui->group_list,SIGNAL(clicked(const QModelIndex&)),this,SLOT(group_list_item_click(const QModelIndex&)));
 }
 
 /*
@@ -70,18 +77,29 @@ void SetUserGroupWindow::showUserList(){
  * user_list item点击
 */
 void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
+
+      //编辑用户和删除用户的按钮可见
     ui->edit_user->setEnabled(true);
     ui->delete_user->setEnabled(true);
+
+    //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);
-    ui->edit_access->setEnabled(true);
+    ui->id_value->setVisible(true);//为何是灰色状态
+    ui->label_id->setVisible(true);
+
+
+    ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
     ui->file_access->setEnabled(false);
     ui->dir_access->setEnabled(false);
     ui->edit_access->setText("编辑权限");
-    ftpUser=sqlConnection->queryUserByName(index.data().toString());
+    ftpUser=sqlConnection->queryUserByName(index.data().toString());//通过当前index来获取用户名并创建用户
+    //设置右边的第一个菜单栏的显示
     ui->label_id->setText("用户ID");
     ui->label_name->setText("用户名");
     ui->label_group->setText("用户组");
     ui->label_path->setText("根目录");
+
+    //为其赋值
     ui->id_value->setText(QString::number(ftpUser.getId()));
     ui->name_value->setText(ftpUser.getName());
     if(ftpUser.getFtpGroup()==0){
@@ -201,8 +219,32 @@ void SetUserGroupWindow::showGroupList(){
 /*
  * group_list item 点击
 */
-void SetUserGroupWindow::group_list_item_click(const QPoint &point){
+void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
+    //编辑用户和删除用户的按钮可见
+  ui->edit_group->setEnabled(true);
+  ui->delete_group->setEnabled(true);
+
+     //使右边第一个菜单栏可见
+     ui->groupBox_info->setEnabled(true);
+
+     ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
+     ui->file_access->setEnabled(false);
+     ui->dir_access->setEnabled(false);
+     ui->edit_access->setText("编辑权限");
+     //创建一个当前选中的用户组对象
+     ftpGroup=sqlConnection->queryGroupByName(index.data().toString());
+     //设置右边的第一个菜单栏的显示
+     ui->label_id->setText("用户组ID");
+     ui->label_name->setText("用户组名");
+     ui->label_group->setText("组员个数");
+     ui->label_path->setText("根目录");
+
+     //为其赋值
+     ui->id_value->setText(QString::number(ftpGroup.getId()));
+     ui->name_value->setText(ftpGroup.getName());
+     ui->group_value->setText( QString::number(ftpGroup.getCount()));
+     ui->path_value->setText(ftpGroup.getPath());
 }
 
 /*
@@ -227,6 +269,7 @@ void SetUserGroupWindow::edit_or_save_access(){
         edit_or_save=true;
         ui->file_access->setEnabled(true);
         ui->dir_access->setEnabled(true);
+        //存到数据库的是777
         ui->edit_access->setText("保存权限");
     }else{
         edit_or_save=false;
@@ -241,7 +284,7 @@ void SetUserGroupWindow::edit_or_save_access(){
 */
 void SetUserGroupWindow::newUser(){
     newUserDialog=new NewUserDialog(this,sqlConnection);
-    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));
+    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));//接收到信号之后更新用户列表
     newUserDialog->exec();
 }
 
@@ -249,7 +292,9 @@ void SetUserGroupWindow::newUser(){
  * 弹出编辑用户界面
 */
 void SetUserGroupWindow::editUser(){
-
+    editUserDialog=new EditUserDialog(this,sqlConnection,ftpUser);
+    connect(editUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));//接收到更新信号后就更新列表
+    editUserDialog->exec();
 }
 
 /*
@@ -257,6 +302,7 @@ void SetUserGroupWindow::editUser(){
 */
 void SetUserGroupWindow::deleteUser(){
     deleteUserDialog=new DeleteUserDialog(this,sqlConnection,ftpUser.getId(),ftpUser.getName());
+    connect(deleteUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));//接收到更新信号后就更新列表
     deleteUserDialog->exec();
 }
 
@@ -264,19 +310,25 @@ void SetUserGroupWindow::deleteUser(){
  * 弹出新建用户组界面
 */
 void SetUserGroupWindow::newGroup(){
-
+     newGroupDialog=new NewGroupDialog(this,sqlConnection);
+     connect(newGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+     newGroupDialog->exec();
 }
 
 /*
  * 弹出编辑用户组界面
 */
 void SetUserGroupWindow::editGroup(){
-
+    editGroupDialog=new EditGroupDialog(this,sqlConnection,ftpGroup);
+    connect(editGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+    editGroupDialog->exec();
 }
 
 /*
  * 弹出删除用户组界面
 */
 void SetUserGroupWindow::deleteGroup(){
-
+    deleteGroupDialog=new DeleteGroupDialog(this,sqlConnection,ftpGroup.getId(),ftpGroup.getName());
+    connect(deleteGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+    deleteGroupDialog->exec();
 }

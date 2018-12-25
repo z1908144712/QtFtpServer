@@ -20,7 +20,11 @@ DeleteUserDialog::~DeleteUserDialog()
 }
 
 void DeleteUserDialog::confirm(){
-
+  //点击确定删除
+    FtpUser user=sqlConnection->queryUserByName(username);
+    sqlConnection->deleteUserById(user.getId());
+    emit refresh();
+    cancel();
 }
 
 void DeleteUserDialog::cancel(){
