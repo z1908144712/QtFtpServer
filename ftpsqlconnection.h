@@ -18,11 +18,14 @@ public:
     bool insertGroup(FtpGroup group);
     bool hasGroupByName(QString name);
     bool insertUser(FtpUser user);
+    bool updateGroupBasic(FtpGroup group);//修改组的基本信息
     bool hasUserByName(QString name);
     bool deleteUserById(int id);
+    bool deleteGroupById(int id);
     QString queryGroupNameById(int id);
     int queryGroupIdByName(QString name);
     FtpUser queryUserByName(QString name);
+    FtpGroup queryGroupByName(QString name);
     FtpGroup queryGroupById(int id);
     QList<QMap<QString,QString>> listGroupNames();
     QList<QMap<QString,QString>> listUserNames();

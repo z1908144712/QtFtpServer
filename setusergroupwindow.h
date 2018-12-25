@@ -5,7 +5,11 @@
 #include <QDialog>
 #include <QPoint>
 #include "newuserdialog.h"
+#include "newgroupdialog.h"
+#include "edituserdialog.h"
+#include "editgroupdialog.h"
 #include "deleteuserdialog.h"
+#include "deletegroupdialog.h"
 #include "ftpsqlconnection.h"
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -29,7 +33,11 @@ private:
 
     Ui::SetUserGroupWindow *ui;
     NewUserDialog *newUserDialog;
+    NewGroupDialog *newGroupDialog;
     DeleteUserDialog *deleteUserDialog;
+    DeleteGroupDialog *deleteGroupDialog;
+    EditGroupDialog *editGroupDialog;
+    EditUserDialog *editUserDialog;
     FtpSqlConnection *sqlConnection;
     QStandardItemModel *group_standardItemModel;
     QStandardItemModel *user_standardItemModel;

@@ -89,6 +89,28 @@ bool FtpSqlConnection::insertUser(FtpUser user){
 }
 
 /*
+ * ftpgroup更新基本信息
+ * @return bool
+*/
+
+bool FtpSqlConnection::updateGroupBasic(FtpGroup group){
+
+    // update student set name = :name where id = :id";
+
+     QString sql="update ftpgroup set name = :name, path= :path where id=:id;";
+     QSqlQuery sqlQuery;
+     sqlQuery.prepare(sql);
+     sqlQuery.bindValue(":name",group.getName());
+     sqlQuery.bindValue(":path",group.getPath());
+     sqlQuery.bindValue(":id",group.getId());
+     if(!sqlQuery.exec()){
+         qDebug()<<sqlQuery.lastError();
+         return false;
+     }else{
+         return true;
+     }
+}
+/*
  * ftpgroup插入数据
  * @return bool
 */
@@ -130,6 +152,23 @@ bool FtpSqlConnection::deleteUserById(int id){
 }
 
 /*
+ * 根据id从ftpgroup删除数据
+ * @return bool
+*/
+bool FtpSqlConnection:: deleteGroupById(int id){
+    QString sql="delete from ftpgroup where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
  * 根据name从ftpuser查询数据
  * @return  FtpUser
 */
@@ -146,6 +185,27 @@ FtpUser FtpSqlConnection::queryUserByName(QString name){
             return FtpUser(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toString(),sqlQuery.value(3).toInt(),sqlQuery.value(4).toString(),sqlQuery.value(5).toString(),sqlQuery.value(6).toString());
         }else{
             return FtpUser();
+        }
+    }
+}
+
+/*
+ * 根据name从ftpgroup查询数据
+ * @return  FtpGroup
+*/
+FtpGroup FtpSqlConnection::queryGroupByName(QString name){
+    QString sql="select * from ftpgroup where name=:name;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":name",name);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return FtpGroup();
+    }else{
+        if(sqlQuery.next()){//存在的话，就返回用户组
+            return FtpGroup(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toInt(),sqlQuery.value(3).toString(),sqlQuery.value(4).toString(),sqlQuery.value(5).toString());
+        }else{
+            return FtpGroup();
         }
     }
 }

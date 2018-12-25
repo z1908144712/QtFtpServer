@@ -41,7 +41,11 @@ SOURCES += main.cpp\
     newuserdialog.cpp \
     ftpabout.cpp \
     ftpcrypto.cpp \
-    deleteuserdialog.cpp
+    deleteuserdialog.cpp \
+    newgroupdialog.cpp \
+    deletegroupdialog.cpp \
+    edituserdialog.cpp \
+    editgroupdialog.cpp
 
 HEADERS  += mainwindow.h \
     ftpcommand.h \
@@ -60,13 +64,21 @@ HEADERS  += mainwindow.h \
     newuserdialog.h \
     ftpabout.h \
     ftpcrypto.h \
-    deleteuserdialog.h
+    deleteuserdialog.h \
+    newgroupdialog.h \
+    deletegroupdialog.h \
+    edituserdialog.h \
+    editgroupdialog.h
 
 FORMS    += mainwindow.ui \
     setusergroupwindow.ui \
     newuserdialog.ui \
     ftpabout.ui \
-    deleteuserdialog.ui
+    deleteuserdialog.ui \
+    newgroupdialog.ui \
+    deletegroupdialog.ui \
+    edituserdialog.ui \
+    editgroupdialog.ui
 
 RESOURCES += \
     res.qrc
