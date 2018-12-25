@@ -245,7 +245,7 @@ void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 }
 
 /*
- * 刷新user_list
+ * user操作后刷新必要控件
 */
 void SetUserGroupWindow::refresh_user(){
     showUserList();
@@ -328,7 +328,7 @@ void SetUserGroupWindow::deleteUser(){
 */
 void SetUserGroupWindow::newGroup(){
      newGroupDialog=new NewGroupDialog(this,sqlConnection);
-     connect(newGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group_list()));//接收到更新信号后就更新列表
+     connect(newGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
      newGroupDialog->exec();
 }
 
