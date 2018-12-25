@@ -21,11 +21,11 @@ private:
     FtpSqlConnection *sqlConnection;
     int id;
     QString username;
-signals:
-    void  refresh();
 private slots:
     void confirm();
     void cancel();
+signals:
+    void refresh();
 };
 
 #endif // DELETEUSERDIALOG_H

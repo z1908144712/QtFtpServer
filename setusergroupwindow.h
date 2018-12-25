@@ -49,7 +49,7 @@ private:
     void setFileAccess(QString file);
     void setDirectoryAcccess(QString directorty);
 
-    bool edit_or_save;//保存还是编辑
+    bool edit_or_save;
 
 private slots:
     void newUser();
@@ -58,10 +58,10 @@ private slots:
     void newGroup();
     void editGroup();
     void deleteGroup();
-    void refresh_user_list();
-    void refresh_group_list();
+    void refresh_user();
+    void refresh_group();
     void user_list_item_click(const QModelIndex&);
-    void group_list_item_click(const QModelIndex &);
+    void group_list_item_click(const QModelIndex&);
     void edit_or_save_access();
     void file_access_click();
     void file_no_access_click();

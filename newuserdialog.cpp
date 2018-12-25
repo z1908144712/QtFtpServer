@@ -39,16 +39,19 @@ void NewUserDialog::confirm(){
     password1=ui->password1->text().trimmed();
     password2=ui->password2->text().trimmed();
     path=ui->path->text().trimmed();
-    group=sqlConnection->queryGroupIdByName(ui->groups->currentData().toString());
+    group=ui->groups->currentIndex();
     if(!username.isEmpty()&&!password1.isEmpty()&&!password2.isEmpty()){
         if(password1==password2){
             QString crypto_password=FtpCrypto::cryptopassword(password1);
-            if(group==0&&!path.isEmpty()){
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
-                    emit refresh();
-                    cancel();
+            if(group==0){
+                if(!path.isEmpty()){
+                    if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
+                        emit refresh();
+                        cancel();
+                    }
                 }
             }else{
+                group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
                 if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","",""))){
                     emit refresh();
                     cancel();

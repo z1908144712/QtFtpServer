@@ -5,6 +5,7 @@
 #include <QPointer>
 #include <QStatusBar>
 #include "logprint.h"
+#include <ftpuser.h>
 
 class QSslSocket;
 class FtpCommand;
@@ -121,11 +122,15 @@ private:
     DataConnection *dataConnection;
     // Flag whether the client is allowed only read-only access (can download,
     // but not upload/modify).
-    bool readOnly;
+    bool readOnly=false;
 
     LogPrint *logPrint;
 
     QStatusBar *statusBar;
+    FtpUser user;
+    QString file="";          //permission of file
+    QString directory="";     //permission of directory
+    QString path="";          //permission of path
 };
 
 #endif // FTPCONTROLCONNECTION_H
