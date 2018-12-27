@@ -18,6 +18,9 @@ public:
     bool insertGroup(FtpGroup group);
     bool hasGroupByName(QString name);
     bool insertUser(FtpUser user);
+    bool updateUserFileAccess(int id,QString file);
+    bool updateUserDirAccess(int id,QString dir);
+    bool updateUserFileAndDirAccess(int id,QString file,QString dir);
     bool updateGroupBasic(FtpGroup group);//修改组的基本信息
     bool hasUserByName(QString name);
     bool deleteUserById(int id);

@@ -89,6 +89,61 @@ bool FtpSqlConnection::insertUser(FtpUser user){
 }
 
 /*
+ * ftpuser更新文件权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateUserFileAccess(int id, QString file){
+    QString sql="update ftpuser set file=:file where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpuser更新目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateUserDirAccess(int id, QString dir){
+    QString sql="update ftpuser set directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpuser更新文件和目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateUserFileAndDirAccess(int id, QString file, QString dir){
+    QString sql="update ftpuser set file=:file,directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
  * ftpgroup更新基本信息
  * @return bool
 */

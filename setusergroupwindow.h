@@ -48,8 +48,13 @@ private:
     void showGroupList();
     void setFileAccess(QString file);
     void setDirectoryAcccess(QString directorty);
+    void saveUserAccess();
+    QString getFileAccess();
+    QString getDirAccess();
 
     bool edit_or_save;
+    //false时修改user,true时修改group
+    bool save_user_or_group_access;
 
 private slots:
     void newUser();

@@ -3,6 +3,7 @@
 #include <QList>
 #include <QMap>
 #include <QDebug>
+#include <QMessageBox>
 
 /*
  * 设置用户/用户组
@@ -78,9 +79,12 @@ void SetUserGroupWindow::showUserList(){
 */
 void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
 
-      //编辑用户和删除用户的按钮可见
+    //编辑用户和删除用户的按钮可见
     ui->edit_user->setEnabled(true);
     ui->delete_user->setEnabled(true);
+
+    //可编辑user权限
+    save_user_or_group_access=false;
 
     //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);
@@ -110,6 +114,7 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
         ui->path_value->setText(ftpGroup.getPath());
         setFileAccess(ftpGroup.getFile());
         setDirectoryAcccess(ftpGroup.getDirectory());
+        ui->edit_access->setEnabled(false);
     }
 
 }
@@ -186,7 +191,7 @@ void SetUserGroupWindow::setDirectoryAcccess(QString directorty){
     ui->dir_new->setCheckState(Qt::Unchecked);
     ui->dir_rename->setCheckState(Qt::Unchecked);
     ui->dir_no_access->setCheckState(Qt::Unchecked);
-    if(directorty.length()<4||directorty=="000"){
+    if(directorty.length()<3||directorty=="000"){
         ui->dir_no_access->setChecked(true);
         return;
     }
@@ -284,15 +289,43 @@ void SetUserGroupWindow::refresh_group(){
 */
 void SetUserGroupWindow::edit_or_save_access(){
     if(!edit_or_save){
+        //修改权限
         edit_or_save=true;
         ui->file_access->setEnabled(true);
         ui->dir_access->setEnabled(true);
         ui->edit_access->setText("保存权限");
     }else{
+        //保存权限
+        if(!save_user_or_group_access){
+            saveUserAccess();
+        }else{
+
+        }
         edit_or_save=false;
         ui->file_access->setEnabled(false);
         ui->dir_access->setEnabled(false);
         ui->edit_access->setText("编辑权限");
+    }
+}
+
+/*
+ * 保存用户权限
+*/
+void SetUserGroupWindow::saveUserAccess(){
+    QString user_file_access=getFileAccess();
+    QString user_dir_access=getDirAccess();
+    if(user_file_access!=ftpUser.getFile()&&user_dir_access!=ftpUser.getDirectory()){
+        if(!sqlConnection->updateUserFileAndDirAccess(ftpUser.getId(),user_file_access,user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else if(user_file_access!=ftpUser.getFile()){
+        if(!sqlConnection->updateUserFileAccess(ftpUser.getId(),user_file_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else{
+        if(!sqlConnection->updateUserDirAccess(ftpUser.getId(),user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
     }
 }
 
@@ -348,4 +381,63 @@ void SetUserGroupWindow::deleteGroup(){
     deleteGroupDialog=new DeleteGroupDialog(this,sqlConnection,ftpGroup.getId(),ftpGroup.getName());
     connect(deleteGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
     deleteGroupDialog->exec();
+}
+
+/*
+ * 获取当前文件权限
+*/
+QString SetUserGroupWindow::getFileAccess(){
+    if(ui->file_no_access->isChecked()){
+        return "0000";
+    }else{
+        QString file_access="";
+        if(ui->file_delete->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_upload->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_rename->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_download->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        return file_access;
+    }
+}
+
+/*
+ * 获取当前目录权限
+*/
+QString SetUserGroupWindow::getDirAccess(){
+    if(ui->dir_no_access->isChecked()){
+        return "000";
+    }else{
+        QString dir_access="";
+        if(ui->dir_delete->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        if(ui->dir_new->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        if(ui->dir_rename->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        return dir_access;
+    }
 }
