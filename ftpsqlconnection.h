@@ -18,6 +18,7 @@ public:
     bool insertGroup(FtpGroup group);
     bool hasGroupByName(QString name);
     bool insertUser(FtpUser user);
+    bool updateUserBasic(FtpUser ftpUser);
     bool updateUserFileAccess(int id,QString file);
     bool updateUserDirAccess(int id,QString dir);
     bool updateUserFileAndDirAccess(int id,QString file,QString dir);
@@ -26,8 +27,10 @@ public:
     bool deleteUserById(int id);
     bool deleteGroupById(int id);
     QString queryGroupNameById(int id);
+    QString queryGroupPathByName(QString name);
     int queryGroupIdByName(QString name);
     FtpUser queryUserByName(QString name);
+    FtpUser queryUserById(int id);
     FtpGroup queryGroupByName(QString name);
     FtpGroup queryGroupById(int id);
     QList<QMap<QString,QString>> listGroupNames();

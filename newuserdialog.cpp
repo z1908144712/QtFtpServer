@@ -52,7 +52,7 @@ void NewUserDialog::confirm(){
                 }
             }else{
                 group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","",""))){
+                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","0000","000"))){
                     emit refresh();
                     cancel();
                 }

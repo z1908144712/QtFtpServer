@@ -19,12 +19,14 @@ private:
     Ui::EditUserDialog *ui;
     FtpSqlConnection *sqlConnection;
     FtpUser ftpUser;
-    int id;
+    QString ftpgroup;
 signals:
     void  refresh();
 private slots:
+    void findfile();
     void confirm();
     void cancel();
+    void combobox_item_changed(const QString&);
 };
 
 #endif // EDITUSERDIALOG_H
