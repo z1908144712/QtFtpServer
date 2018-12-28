@@ -7,7 +7,7 @@
 #include <QHostInfo>
 #include <QSslSocket>
 
-FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar) :
+FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
     server = new SslServer(this);
@@ -23,6 +23,7 @@ FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *lo
     this->onlyOneIpAllowed = onlyOneIpAllowed;
     this->logPrint=logPrint;
     this->statusBar=statusBar;
+    this->sqlConnection=sqlConnection;
 }
 
 bool FtpServer::isListening()
@@ -64,5 +65,5 @@ void FtpServer::startNewControlConnection()
     }
 
     // Create a new FTP control connection on this socket.
-    new FtpControlConnection(this, socket, logPrint,statusBar);
+    new FtpControlConnection(this, socket, logPrint,statusBar,sqlConnection);
 }
