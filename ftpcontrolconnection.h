@@ -6,6 +6,7 @@
 #include <QStatusBar>
 #include "logprint.h"
 #include <ftpuser.h>
+#include <ftpsqlconnection.h>
 
 class QSslSocket;
 class FtpCommand;
@@ -20,7 +21,7 @@ class FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,QStatusBar *statusBar);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection);
     ~FtpControlConnection();
 
     static int user_counter;
@@ -131,6 +132,7 @@ private:
     QString file="";          //permission of file
     QString directory="";     //permission of directory
     QString path="";          //permission of path
+    FtpSqlConnection *sqlConnection;
 };
 
 #endif // FTPCONTROLCONNECTION_H

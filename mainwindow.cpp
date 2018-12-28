@@ -10,9 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    sqlConnection=new FtpSqlConnection("access.db","","");
     ui->setupUi(this);
     logPrint=new LogPrint(ui->textEdit);
-    server=new FtpServer(this,21,false,logPrint,ui->statusBar);
+    server=new FtpServer(this,21,false,logPrint,ui->statusBar,sqlConnection);
     connect(server, SIGNAL(newPeerIp(QString)),this,SLOT(onPeerIpChanged(QString)));
     connect(ui->menuBar,SIGNAL(triggered(QAction*)),this,SLOT(trigerMenu(QAction*)));
     if (server->isListening()) {
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
         logPrint->setText("Not listening");
         logPrint->print();
     }
-    sqlConnection=new FtpSqlConnection("access.db","","");
+
 }
 
 MainWindow::~MainWindow()
