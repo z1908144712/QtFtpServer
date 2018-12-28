@@ -147,7 +147,6 @@ bool FtpSqlConnection::updateUserFileAndDirAccess(int id, QString file, QString 
  * ftpgroup更新基本信息
  * @return bool
 */
-
 bool FtpSqlConnection::updateGroupBasic(FtpGroup group){
 
     // update student set name = :name where id = :id";
@@ -341,8 +340,8 @@ QList<QMap<QString,QString>> FtpSqlConnection::listGroupNames(){
     }else{
         while (sqlQuery.next()) {
             QMap<QString,QString> map;
-            map.insert("id",sqlQuery.value(0).toString());
-            map.insert("name",sqlQuery.value(1).toString());
+            map.insert("id",sqlQuery.value(0).toString());//组的id
+            map.insert("name",sqlQuery.value(1).toString());//组的名字
             list.append(map);
         }
     }
