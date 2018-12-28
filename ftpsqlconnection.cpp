@@ -89,6 +89,50 @@ bool FtpSqlConnection::insertUser(FtpUser user){
 }
 
 /*
+ * ftpuser更新用户信息
+ * @return bool
+*/
+bool FtpSqlConnection::updateUserBasic(FtpUser ftpUser){
+    FtpUser user=queryUserById(ftpUser.getId());
+    QString sql="update ftpuser set ";
+    QSqlQuery sqlQuery;
+    if(user.getName()!=ftpUser.getName()){
+        sql+="username=:username,";
+    }
+    if(user.getPassword()!=ftpUser.getPassword()){
+        sql+="password=:password,";
+    }
+    if(user.getFtpGroup()!=ftpUser.getFtpGroup()){
+        sql+="ftpgroup=:ftpgroup,";
+    }
+    if(user.getPath()!=ftpUser.getPath()){
+        sql+="path=:path,";
+    }
+    sql.chop(1);
+    sql+=" where id=:id;";
+    sqlQuery.prepare(sql);
+    if(user.getName()!=ftpUser.getName()){
+        sqlQuery.bindValue(":username",ftpUser.getName());
+    }
+    if(user.getPassword()!=ftpUser.getPassword()){
+        sqlQuery.bindValue(":password",ftpUser.getPassword());
+    }
+    if(user.getFtpGroup()!=ftpUser.getFtpGroup()){
+        sqlQuery.bindValue(":ftpgroup",ftpUser.getFtpGroup());
+    }
+    if(user.getPath()!=ftpUser.getPath()){
+        sqlQuery.bindValue(":path",ftpUser.getPath());
+    }
+    sqlQuery.bindValue(":id",ftpUser.getId());
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
  * ftpuser更新文件权限
  * @return bool
 */
@@ -244,6 +288,27 @@ FtpUser FtpSqlConnection::queryUserByName(QString name){
 }
 
 /*
+ * 根据id从ftpuser查询数据
+ * @return  FtpUser
+*/
+FtpUser FtpSqlConnection::queryUserById(int id){
+    QString sql="select * from ftpuser where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return FtpUser();
+    }else{
+        if(sqlQuery.next()){
+            return FtpUser(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toString(),sqlQuery.value(3).toInt(),sqlQuery.value(4).toString(),sqlQuery.value(5).toString(),sqlQuery.value(6).toString());
+        }else{
+            return FtpUser();
+        }
+    }
+}
+
+/*
  * 根据name从ftpgroup查询数据
  * @return  FtpGroup
 */
@@ -295,6 +360,23 @@ QString FtpSqlConnection::queryGroupNameById(int id){
     QSqlQuery sqlQuery;
     sqlQuery.prepare(sql);
     sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return "";
+    }else{
+        if(sqlQuery.next()){
+            return sqlQuery.value(0).toString();
+        }else{
+            return "";
+        }
+    }
+}
+
+QString FtpSqlConnection::queryGroupPathByName(QString name){
+    QString sql="select path from ftpgroup where name=:name;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":name",name);
     if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
         return "";

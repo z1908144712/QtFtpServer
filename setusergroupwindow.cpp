@@ -83,6 +83,10 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
     ui->edit_user->setEnabled(true);
     ui->delete_user->setEnabled(true);
 
+    //不可编辑或删除用户组
+    ui->edit_group->setEnabled(false);
+    ui->delete_group->setEnabled(false);
+
     //可编辑user权限
     save_user_or_group_access=false;
 
