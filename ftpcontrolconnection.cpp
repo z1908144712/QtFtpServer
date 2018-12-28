@@ -16,7 +16,6 @@
 #include <QSslSocket>
 #include <ftpcrypto.h>
 #include <ftpsqlconnection.h>
-#include <QMessageBox>
 
 FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
     QObject(parent)
@@ -210,8 +209,7 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         if(file[3]=='1')
             retr(toLocalPath(commandParameters));
         else{
-                reply("error no permission to "+toLocalPath(commandParameters));
-                QMessageBox::about(NULL,"error","no perssion");
+                reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
         }
     } else if ("REST" == command) {
         reply("350 Requested file action pending further information.");
@@ -235,48 +233,42 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         if(file[2]=='1')
             stor(toLocalPath(commandParameters));
         else{
-                reply("error no permission to "+toLocalPath(commandParameters));
-                QMessageBox::about(NULL,"error","no perssion");
+                reply("553 Requested action not taken.File name not allowed.");
         }
     } else if ("MKD" == command) {                 //mkdir a directory
         if(directory[1]=='1')
             mkd(toLocalPath(commandParameters));
         else{
-                reply("error no permission to "+toLocalPath(commandParameters));
-                QMessageBox::about(NULL,"error","no perssion");
+                reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
         }
     } else if ("RMD" == command) {                 //rmdir a directory
         if(directory[0]=='1')
             rmd(toLocalPath(commandParameters));
         else{
-                reply("error no permission to "+toLocalPath(commandParameters));
-                QMessageBox::about(NULL,"error","no perssion");
+                reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
         }
     } else if ("DELE" == command) {                //delete a file
         if(file[0]=='1')
             dele(toLocalPath(commandParameters));
         else{
-                reply("error no permission to "+toLocalPath(commandParameters));
-                QMessageBox::about(NULL,"error","no perssion");
+                reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
         }
-    } else if ("RNFR" == command) {
+    } else if ("RNFR" == command) {    //rename a file or directory
         QFileInfo f(toLocalPath(commandParameters));
         if(f.isDir())
         {
             if(directory[2]=='1')
                 reply("350 Requested file action pending further information.");
             else{
-                    reply("error no permission to "+toLocalPath(commandParameters));
-                    QMessageBox::about(NULL,"error","no perssion");
+                    reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
             }
         }
         else if(f.isFile())
         {
-            if(directory[1]=='1')
+            if(file[1]=='1')
                 reply("350 Requested file action pending further information.");
             else{
-                    reply("error no permission to "+toLocalPath(commandParameters));
-                    QMessageBox::about(NULL,"error","no perssion");
+                    reply("550 Requested action not taken.File unavailable (e.g., file not found, no access).");
             }
         }
     } else if ("RNTO" == command) {                   //rename a file or directory
