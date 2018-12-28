@@ -214,11 +214,10 @@ bool FtpSqlConnection::updateGroupBasic(FtpGroup group){
 */
 bool FtpSqlConnection::insertGroup(FtpGroup group){
     if(!hasGroupByName(group.getName())){
-        QString sql="insert into ftpgroup(id,name,count,path,file,directory) values(null,:name,:count,:path,:file,:directory);";
+        QString sql="insert into ftpgroup(id,name,path,file,directory) values(null,:name,:path,:file,:directory);";
         QSqlQuery sqlQuery;
         sqlQuery.prepare(sql);
         sqlQuery.bindValue(":name",group.getName());
-        sqlQuery.bindValue(":count",group.getCount());
         sqlQuery.bindValue(":path",group.getPath());
         sqlQuery.bindValue(":file",group.getFile());
         sqlQuery.bindValue(":directory",group.getDirectory());
@@ -322,7 +321,7 @@ FtpGroup FtpSqlConnection::queryGroupByName(QString name){
         return FtpGroup();
     }else{
         if(sqlQuery.next()){//存在的话，就返回用户组
-            return FtpGroup(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toInt(),sqlQuery.value(3).toString(),sqlQuery.value(4).toString(),sqlQuery.value(5).toString());
+            return FtpGroup(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toString(),sqlQuery.value(3).toString(),sqlQuery.value(4).toString());
         }else{
             return FtpGroup();
         }
@@ -343,7 +342,7 @@ FtpGroup FtpSqlConnection::queryGroupById(int id){
         return FtpGroup();
     }else{
         if(sqlQuery.next()){
-            return FtpGroup(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toInt(),sqlQuery.value(3).toString(),sqlQuery.value(4).toString(),sqlQuery.value(5).toString());
+            return FtpGroup(sqlQuery.value(0).toInt(),sqlQuery.value(1).toString(),sqlQuery.value(2).toString(),sqlQuery.value(3).toString(),sqlQuery.value(4).toString());
         }else{
             qDebug()<<"id"<<id;
             return FtpGroup();
