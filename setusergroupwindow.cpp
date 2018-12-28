@@ -227,9 +227,13 @@ void SetUserGroupWindow::showGroupList(){
 */
 void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
-    //编辑用户和删除用户的按钮可见
+    //编辑用户组和删除用户组的按钮可见
     ui->edit_group->setEnabled(true);
     ui->delete_group->setEnabled(true);
+
+    //编辑用户和删除用户的按钮不可见
+    ui->edit_user->setEnabled(false);
+    ui->delete_user->setEnabled(false);
 
     //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);

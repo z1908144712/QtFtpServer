@@ -10,7 +10,6 @@
 FtpGroup::FtpGroup(){
     this->id=0;
     this->name="";
-    this->count=0;
     this->path="";
     this->file="";
     this->directory="";
@@ -24,16 +23,14 @@ FtpGroup::FtpGroup(QString name,QString path,QString file,QString directory){
     this->path=path;
     this->file=file;
     this->directory=directory;
-    this->count=0;
 }
 
 /*
  * 查询数据使用构造方法
 */
-FtpGroup::FtpGroup(int id, QString name, int count, QString path, QString file, QString directory){
+FtpGroup::FtpGroup(int id, QString name,  QString path, QString file, QString directory){
     this->id=id;
     this->name=name;
-    this->count=count;
     this->path=path;
     this->file=file;
     this->directory=directory;
@@ -52,14 +49,6 @@ QString FtpGroup::getName(){
 
 void FtpGroup::setName(QString name){
     this->name=name;
-}
-
-int FtpGroup::getCount(){
-    return count;
-}
-
-void FtpGroup::setCount(int count){
-    this->count=count;
 }
 
 QString FtpGroup::getPath(){
