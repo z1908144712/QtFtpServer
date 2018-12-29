@@ -5,7 +5,11 @@
 #include <QDialog>
 #include <QPoint>
 #include "newuserdialog.h"
+#include "newgroupdialog.h"
+#include "edituserdialog.h"
+#include "editgroupdialog.h"
 #include "deleteuserdialog.h"
+#include "deletegroupdialog.h"
 #include "ftpsqlconnection.h"
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -29,7 +33,11 @@ private:
 
     Ui::SetUserGroupWindow *ui;
     NewUserDialog *newUserDialog;
+    NewGroupDialog *newGroupDialog;
     DeleteUserDialog *deleteUserDialog;
+    DeleteGroupDialog *deleteGroupDialog;
+    EditGroupDialog *editGroupDialog;
+    EditUserDialog *editUserDialog;
     FtpSqlConnection *sqlConnection;
     QStandardItemModel *group_standardItemModel;
     QStandardItemModel *user_standardItemModel;
@@ -40,8 +48,13 @@ private:
     void showGroupList();
     void setFileAccess(QString file);
     void setDirectoryAcccess(QString directorty);
+    void saveUserAccess();
+    QString getFileAccess();
+    QString getDirAccess();
 
     bool edit_or_save;
+    //false时修改user,true时修改group
+    bool save_user_or_group_access;
 
 private slots:
     void newUser();
@@ -50,10 +63,10 @@ private slots:
     void newGroup();
     void editGroup();
     void deleteGroup();
-    void refresh_user_list();
-    void refresh_group_list();
+    void refresh_user();
+    void refresh_group();
     void user_list_item_click(const QModelIndex&);
-    void group_list_item_click(const QPoint&);
+    void group_list_item_click(const QModelIndex&);
     void edit_or_save_access();
     void file_access_click();
     void file_no_access_click();

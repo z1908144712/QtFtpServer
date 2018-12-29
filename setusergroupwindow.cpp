@@ -3,6 +3,7 @@
 #include <QList>
 #include <QMap>
 #include <QDebug>
+#include <QMessageBox>
 
 /*
  * 设置用户/用户组
@@ -39,8 +40,11 @@ void SetUserGroupWindow::init_data(){
 */
 void SetUserGroupWindow::init_connect(){
     connect(ui->new_user,SIGNAL(clicked()),this,SLOT(newUser()));
+    connect(ui->new_group,SIGNAL(clicked()),this,SLOT(newGroup()));
     connect(ui->edit_user,SIGNAL(clicked()),this,SLOT(editUser()));
+    connect(ui->edit_group,SIGNAL(clicked()),this,SLOT(editGroup()));
     connect(ui->delete_user,SIGNAL(clicked()),this,SLOT(deleteUser()));
+    connect(ui->delete_group,SIGNAL(clicked()),this,SLOT(deleteGroup()));
     connect(ui->edit_access,SIGNAL(clicked()),this,SLOT(edit_or_save_access()));
     connect(ui->file_delete,SIGNAL(clicked()),this,SLOT(file_access_click()));
     connect(ui->file_upload,SIGNAL(clicked()),this,SLOT(file_access_click()));
@@ -51,7 +55,11 @@ void SetUserGroupWindow::init_connect(){
     connect(ui->dir_new,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_rename,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_no_access,SIGNAL(clicked()),this,SLOT(dir_no_access_click()));
+
+    //点击用户列表的信号与槽
     connect(ui->user_list,SIGNAL(clicked(const QModelIndex&)),this,SLOT(user_list_item_click(const QModelIndex&)));
+    //点击用户组列表的信号与槽
+    connect(ui->group_list,SIGNAL(clicked(const QModelIndex&)),this,SLOT(group_list_item_click(const QModelIndex&)));
 }
 
 /*
@@ -70,18 +78,33 @@ void SetUserGroupWindow::showUserList(){
  * user_list item点击
 */
 void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
+
+    //编辑用户和删除用户的按钮可见
     ui->edit_user->setEnabled(true);
     ui->delete_user->setEnabled(true);
+
+    //不可编辑或删除用户组
+    ui->edit_group->setEnabled(false);
+    ui->delete_group->setEnabled(false);
+
+    //可编辑user权限
+    save_user_or_group_access=false;
+
+    //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);
-    ui->edit_access->setEnabled(true);
+
+    ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
     ui->file_access->setEnabled(false);
     ui->dir_access->setEnabled(false);
     ui->edit_access->setText("编辑权限");
-    ftpUser=sqlConnection->queryUserByName(index.data().toString());
+    ftpUser=sqlConnection->queryUserByName(index.data().toString());//通过当前index来获取用户名并创建用户
+    //设置右边的第一个菜单栏的显示
     ui->label_id->setText("用户ID");
     ui->label_name->setText("用户名");
     ui->label_group->setText("用户组");
     ui->label_path->setText("根目录");
+
+    //为其赋值
     ui->id_value->setText(QString::number(ftpUser.getId()));
     ui->name_value->setText(ftpUser.getName());
     if(ftpUser.getFtpGroup()==0){
@@ -95,6 +118,7 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
         ui->path_value->setText(ftpGroup.getPath());
         setFileAccess(ftpGroup.getFile());
         setDirectoryAcccess(ftpGroup.getDirectory());
+        ui->edit_access->setEnabled(false);
     }
 
 }
@@ -171,7 +195,7 @@ void SetUserGroupWindow::setDirectoryAcccess(QString directorty){
     ui->dir_new->setCheckState(Qt::Unchecked);
     ui->dir_rename->setCheckState(Qt::Unchecked);
     ui->dir_no_access->setCheckState(Qt::Unchecked);
-    if(directorty.length()<4||directorty=="000"){
+    if(directorty.length()<3||directorty=="000"){
         ui->dir_no_access->setChecked(true);
         return;
     }
@@ -201,21 +225,70 @@ void SetUserGroupWindow::showGroupList(){
 /*
  * group_list item 点击
 */
-void SetUserGroupWindow::group_list_item_click(const QPoint &point){
+void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
 
+    //编辑用户组和删除用户组的按钮可见
+    ui->edit_group->setEnabled(true);
+    ui->delete_group->setEnabled(true);
+
+    //编辑用户和删除用户的按钮不可见
+    ui->edit_user->setEnabled(false);
+    ui->delete_user->setEnabled(false);
+
+    //使右边第一个菜单栏可见
+    ui->groupBox_info->setEnabled(true);
+
+    ui->edit_access->setEnabled(true);//编辑权限的按钮，点击按钮才可以权限配置
+    ui->file_access->setEnabled(false);
+    ui->dir_access->setEnabled(false);
+    ui->edit_access->setText("编辑权限");
+    //创建一个当前选中的用户组对象
+    ftpGroup=sqlConnection->queryGroupByName(index.data().toString());
+    //设置右边的第一个菜单栏的显示
+    ui->label_id->setText("用户组ID");
+    ui->label_name->setText("用户组名");
+    ui->label_group->setText("组员个数");
+    ui->label_path->setText("根目录");
+
+    //为其赋值
+    ui->id_value->setText(QString::number(ftpGroup.getId()));
+    ui->name_value->setText(ftpGroup.getName());
+    ui->group_value->setText( QString::number(ftpGroup.getCount()));
+    ui->path_value->setText(ftpGroup.getPath());
 }
 
 /*
- * 刷新user_list
+ * user操作后刷新必要控件
 */
-void SetUserGroupWindow::refresh_user_list(){
+void SetUserGroupWindow::refresh_user(){
     showUserList();
+    ui->edit_user->setEnabled(false);
+    ui->delete_user->setEnabled(false);
+    ui->groupBox_info->setEnabled(false);
+    ui->id_value->setText("");
+    ui->name_value->setText("");
+    ui->group_value->setText("");
+    ui->path_value->setText("");
+    ui->file_access->setEnabled(false);
+    ui->dir_access->setEnabled(false);
+    ui->file_delete->setCheckState(Qt::Unchecked);
+    ui->file_upload->setCheckState(Qt::Unchecked);
+    ui->file_rename->setCheckState(Qt::Unchecked);
+    ui->file_download->setCheckState(Qt::Unchecked);
+    ui->file_no_access->setCheckState(Qt::Unchecked);
+    ui->dir_delete->setCheckState(Qt::Unchecked);
+    ui->dir_new->setCheckState(Qt::Unchecked);
+    ui->dir_rename->setCheckState(Qt::Unchecked);
+    ui->dir_no_access->setCheckState(Qt::Unchecked);
+    ui->edit_access->setEnabled(false);
+    ui->edit_access->setText("编辑权限");
+    edit_or_save=false;
 }
 
 /*
- * 刷新group_list
+ * group操作后刷新必要控件
 */
-void SetUserGroupWindow::refresh_group_list(){
+void SetUserGroupWindow::refresh_group(){
     showGroupList();
 }
 
@@ -224,11 +297,18 @@ void SetUserGroupWindow::refresh_group_list(){
 */
 void SetUserGroupWindow::edit_or_save_access(){
     if(!edit_or_save){
+        //修改权限
         edit_or_save=true;
         ui->file_access->setEnabled(true);
         ui->dir_access->setEnabled(true);
         ui->edit_access->setText("保存权限");
     }else{
+        //保存权限
+        if(!save_user_or_group_access){
+            saveUserAccess();
+        }else{
+
+        }
         edit_or_save=false;
         ui->file_access->setEnabled(false);
         ui->dir_access->setEnabled(false);
@@ -237,11 +317,32 @@ void SetUserGroupWindow::edit_or_save_access(){
 }
 
 /*
+ * 保存用户权限
+*/
+void SetUserGroupWindow::saveUserAccess(){
+    QString user_file_access=getFileAccess();
+    QString user_dir_access=getDirAccess();
+    if(user_file_access!=ftpUser.getFile()&&user_dir_access!=ftpUser.getDirectory()){
+        if(!sqlConnection->updateUserFileAndDirAccess(ftpUser.getId(),user_file_access,user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else if(user_file_access!=ftpUser.getFile()){
+        if(!sqlConnection->updateUserFileAccess(ftpUser.getId(),user_file_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else{
+        if(!sqlConnection->updateUserDirAccess(ftpUser.getId(),user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }
+}
+
+/*
  * 弹出新建用户界面
 */
 void SetUserGroupWindow::newUser(){
     newUserDialog=new NewUserDialog(this,sqlConnection);
-    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user_list()));
+    connect(newUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));
     newUserDialog->exec();
 }
 
@@ -249,7 +350,9 @@ void SetUserGroupWindow::newUser(){
  * 弹出编辑用户界面
 */
 void SetUserGroupWindow::editUser(){
-
+    editUserDialog=new EditUserDialog(this,sqlConnection,ftpUser);
+    connect(editUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));//接收到更新信号后就更新列表
+    editUserDialog->exec();
 }
 
 /*
@@ -257,6 +360,7 @@ void SetUserGroupWindow::editUser(){
 */
 void SetUserGroupWindow::deleteUser(){
     deleteUserDialog=new DeleteUserDialog(this,sqlConnection,ftpUser.getId(),ftpUser.getName());
+    connect(deleteUserDialog,SIGNAL(refresh()),this,SLOT(refresh_user()));
     deleteUserDialog->exec();
 }
 
@@ -264,19 +368,84 @@ void SetUserGroupWindow::deleteUser(){
  * 弹出新建用户组界面
 */
 void SetUserGroupWindow::newGroup(){
-
+     newGroupDialog=new NewGroupDialog(this,sqlConnection);
+     connect(newGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
+     newGroupDialog->exec();
 }
 
 /*
  * 弹出编辑用户组界面
 */
 void SetUserGroupWindow::editGroup(){
-
+    editGroupDialog=new EditGroupDialog(this,sqlConnection,ftpGroup);
+    connect(editGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
+    editGroupDialog->exec();
 }
 
 /*
  * 弹出删除用户组界面
 */
 void SetUserGroupWindow::deleteGroup(){
+    deleteGroupDialog=new DeleteGroupDialog(this,sqlConnection,ftpGroup.getId(),ftpGroup.getName());
+    connect(deleteGroupDialog,SIGNAL(refresh()),this,SLOT(refresh_group()));//接收到更新信号后就更新列表
+    deleteGroupDialog->exec();
+}
 
+/*
+ * 获取当前文件权限
+*/
+QString SetUserGroupWindow::getFileAccess(){
+    if(ui->file_no_access->isChecked()){
+        return "0000";
+    }else{
+        QString file_access="";
+        if(ui->file_delete->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_upload->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_rename->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        if(ui->file_download->isChecked()){
+            file_access+="1";
+        }else{
+            file_access+="0";
+        }
+        return file_access;
+    }
+}
+
+/*
+ * 获取当前目录权限
+*/
+QString SetUserGroupWindow::getDirAccess(){
+    if(ui->dir_no_access->isChecked()){
+        return "000";
+    }else{
+        QString dir_access="";
+        if(ui->dir_delete->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        if(ui->dir_new->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        if(ui->dir_rename->isChecked()){
+            dir_access+="1";
+        }else{
+            dir_access+="0";
+        }
+        return dir_access;
+    }
 }

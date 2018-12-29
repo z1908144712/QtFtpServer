@@ -15,7 +15,7 @@ NewUserDialog::NewUserDialog(QWidget *parent,FtpSqlConnection *sqlConnection) :
 {
     ui->setupUi(this);
     this->sqlConnection=sqlConnection;
-    QList<QMap<QString,QString>> list=this->sqlConnection->listGroupNames();
+    QList<QMap<QString,QString>> list=this->sqlConnection->listGroupNames();//这是用户列表
     ui->groups->insertItem(0,"默认");
     for(int i=0;i<list.size();i++){
         ui->groups->insertItem(i+1,list.at(i)["name"]);
@@ -39,17 +39,20 @@ void NewUserDialog::confirm(){
     password1=ui->password1->text().trimmed();
     password2=ui->password2->text().trimmed();
     path=ui->path->text().trimmed();
-    group=sqlConnection->queryGroupIdByName(ui->groups->currentData().toString());
+    group=ui->groups->currentIndex();
     if(!username.isEmpty()&&!password1.isEmpty()&&!password2.isEmpty()){
         if(password1==password2){
             QString crypto_password=FtpCrypto::cryptopassword(password1);
-            if(group==0&&!path.isEmpty()){
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
-                    emit refresh();
-                    cancel();
+            if(group==0){
+                if(!path.isEmpty()){
+                    if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
+                        emit refresh();
+                        cancel();
+                    }
                 }
             }else{
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","",""))){
+                group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
+                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","0000","000"))){
                     emit refresh();
                     cancel();
                 }

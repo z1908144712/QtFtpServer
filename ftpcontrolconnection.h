@@ -5,6 +5,8 @@
 #include <QPointer>
 #include <QStatusBar>
 #include "logprint.h"
+#include <ftpuser.h>
+#include <ftpsqlconnection.h>
 
 class QSslSocket;
 class FtpCommand;
@@ -19,7 +21,7 @@ class FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,QStatusBar *statusBar);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection);
     ~FtpControlConnection();
 
     static int user_counter;
@@ -121,11 +123,16 @@ private:
     DataConnection *dataConnection;
     // Flag whether the client is allowed only read-only access (can download,
     // but not upload/modify).
-    bool readOnly;
+    bool readOnly=false;
 
     LogPrint *logPrint;
 
     QStatusBar *statusBar;
+    FtpUser user;
+    QString file="";          //permission of file
+    QString directory="";     //permission of directory
+    QString path="";          //permission of path
+    FtpSqlConnection *sqlConnection;
 };
 
 #endif // FTPCONTROLCONNECTION_H

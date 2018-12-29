@@ -6,6 +6,7 @@
 #include <QList>
 #include <QStatusBar>
 #include "logprint.h"
+#include <ftpsqlconnection.h>
 
 class SslServer;
 
@@ -16,7 +17,7 @@ class FtpServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar);
+    explicit FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection);
 
     // Whether or not the server is listening for incoming connections. If it
     // is not currently listening then there was an error - probably no
@@ -57,7 +58,7 @@ private:
     LogPrint *logPrint;
 
     QStatusBar *statusBar;
-
+    FtpSqlConnection *sqlConnection;
 
 };
 

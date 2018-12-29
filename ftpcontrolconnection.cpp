@@ -14,10 +14,13 @@
 #include <QDebug>
 #include <QTimer>
 #include <QSslSocket>
+#include <ftpcrypto.h>
+#include <ftpsqlconnection.h>
 
-FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,QStatusBar *statusBar) :
+FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
+    this->sqlConnection=sqlConnection;
     this->socket = socket;
     this->logPrint=logPrint;
     this->statusBar=statusBar;
@@ -49,7 +52,7 @@ void FtpControlConnection::acceptNewData()
     // of using a for-loop until no more lines are available. This is done
     // so we don't block the event loop for a long time.
     processCommand(QString::fromUtf8(socket->readLine()).trimmed());
-    QTimer::singleShot(0, this, SLOT(acceptNewData()));
+    QTimer::singleShot(0, this, SLOT(acceptNewData()));   //不断接受操作命令
 }
 
 void FtpControlConnection::disconnectFromHost()
@@ -202,8 +205,12 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         pasv();
     } else if ("LIST" == command) {
         list(toLocalPath(stripFlagL(commandParameters)), false);
-    } else if ("RETR" == command) {
-        retr(toLocalPath(commandParameters));
+    } else if ("RETR" == command) {                      //download a file
+        if(file[3]=='1')
+            retr(toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
     } else if ("REST" == command) {
         reply("350 Requested file action pending further information.");
     } else if ("NLST" == command) {
@@ -222,17 +229,49 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         reply("200 Command okay.");
     } else if ("NOOP" == command) {
         reply("200 Command okay.");
-    } else if ("STOR" == command) {
-        stor(toLocalPath(commandParameters));
-    } else if ("MKD" == command) {
-        mkd(toLocalPath(commandParameters));
-    } else if ("RMD" == command) {
-        rmd(toLocalPath(commandParameters));
-    } else if ("DELE" == command) {
-        dele(toLocalPath(commandParameters));
-    } else if ("RNFR" == command) {
-        reply("350 Requested file action pending further information.");
-    } else if ("RNTO" == command) {
+    } else if ("STOR" == command) {                //upload a file
+        if(file[2]=='1')
+            stor(toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
+    } else if ("MKD" == command) {                 //mkdir a directory
+        if(directory[1]=='1')
+            mkd(toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
+    } else if ("RMD" == command) {                 //rmdir a directory
+        if(directory[0]=='1')
+            rmd(toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
+    } else if ("DELE" == command) {                //delete a file
+        if(file[0]=='1')
+            dele(toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
+    } else if ("RNFR" == command) {    //rename a file or directory
+        QFileInfo f(toLocalPath(commandParameters));
+        if(f.isDir())
+        {
+            if(directory[2]=='1')
+                reply("350 Requested file action pending further information.");
+            else{
+                    reply("550 you have no access.");
+            }
+        }
+        else if(f.isFile())
+        {
+            if(file[1]=='1')
+                reply("350 Requested file action pending further information.");
+            else{
+                    reply("550 you have no access.");
+            }
+        }
+    } else if ("RNTO" == command) {                   //rename a file or directory
         rnto(toLocalPath(commandParameters));
     } else if ("APPE" == command) {
         stor(toLocalPath(commandParameters), true);
@@ -366,40 +405,35 @@ void FtpControlConnection::size(const QString &fileName)
     }
 }
 
-void FtpControlConnection::pass(const QString &password)
+void FtpControlConnection::pass(const QString &password)   //user input pwd
 {
+    FtpGroup group;
     QString command;
-    QString commandParameters;
-    parseCommand(lastProcessedCommand, &command, &commandParameters);
+    QString commandParameters; //store username
+    parseCommand(lastProcessedCommand, &command, &commandParameters);  //get username from lastProcessedCommand
     if("USER" == command){
-        if(commandParameters=="root"){
-            if(password=="root"){
+        user=sqlConnection->queryUserByName(commandParameters);
+        QString crypto_password=FtpCrypto::cryptopassword(password);
+        if(user.getPassword()==crypto_password){
                 reply("230 You are logged in.");
                 isLoggedIn = true;
-                rootPath="E:\\Project\\Qt\\";
-            }else{
-                reply("530 User name or password was incorrect.");
-            }
-        }else if(commandParameters=="root1"){
-            if(password=="root"){
-                reply("230 You are logged in.");
-                isLoggedIn = true;
-                rootPath="H://qt-opensource-windows-x86-5.12.0.exe";
-            }else{
-                reply("530 User name or password was incorrect.");
-            }
-        }else{
+                if(user.getFtpGroup()==0) {     //ftpgroup==0
+                    file=user.getFile();
+                    directory=user.getDirectory();
+                    path=user.getPath();
+                }
+                else {                            //ftpgroup!=0
+                    group=sqlConnection->queryGroupById(user.getFtpGroup());
+                    file=group.getFile();
+                    directory=group.getDirectory();
+                    path=group.getPath();
+                }
+                rootPath=path;
+        }
+        else{
             reply("530 User name or password was incorrect.");
         }
-    }else{
-        reply("530 User name or password was incorrect.");
     }
-//    if (this->password.isEmpty() || ("USER" == command && this->userName == commandParameters && this->password == password)) {
-//        reply("230 You are logged in.");
-//        isLoggedIn = true;
-//    } else {
-//        reply("530 User name or password was incorrect.");
-//    }
 }
 
 void FtpControlConnection::auth()
