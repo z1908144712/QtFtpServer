@@ -16,7 +16,6 @@ FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *lo
     this->sqlConnection=sqlConnection;
     server = new SslServer(this);
     connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
-    start();
 }
 
 FtpServer::~FtpServer(){
