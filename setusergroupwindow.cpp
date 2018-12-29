@@ -253,7 +253,7 @@ void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
     //为其赋值
     ui->id_value->setText(QString::number(ftpGroup.getId()));
     ui->name_value->setText(ftpGroup.getName());
-    ui->group_value->setText( QString::number(ftpGroup.getCount()));
+//    ui->group_value->setText( QString::number(ftpGroup.getCount()));
     ui->path_value->setText(ftpGroup.getPath());
 }
 
