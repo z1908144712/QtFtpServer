@@ -208,6 +208,64 @@ bool FtpSqlConnection::updateGroupBasic(FtpGroup group){
          return true;
      }
 }
+
+
+/*
+ * ftpgroup更新文件权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupFileAccess(int id, QString file){
+    QString sql="update ftpgroup set file=:file where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpgroup更新目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupDirAccess(int id, QString dir){
+    QString sql="update ftpgroup set directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpgroup更新文件和目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupFileAndDirAccess(int id, QString file, QString dir){
+    QString sql="update ftpgroup set file=:file,directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        //qDebug()<<"修改成功，修改为"<<file<<dir;
+        return true;
+    }
+}
+
 /*
  * ftpgroup插入数据
  * @return bool
