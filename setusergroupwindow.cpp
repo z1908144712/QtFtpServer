@@ -46,11 +46,17 @@ void SetUserGroupWindow::init_connect(){
     connect(ui->delete_user,SIGNAL(clicked()),this,SLOT(deleteUser()));
     connect(ui->delete_group,SIGNAL(clicked()),this,SLOT(deleteGroup()));
     connect(ui->edit_access,SIGNAL(clicked()),this,SLOT(edit_or_save_access()));
+
+    //这两组是设置控件的隐显，针对于文件的，如果选了其他的就不能选择无权限；如果选择了无权限，则不能选其他的
+    //这个功能分别在两个槽函数中实现 file_access_click() file_no_access_click()
     connect(ui->file_delete,SIGNAL(clicked()),this,SLOT(file_access_click()));
     connect(ui->file_upload,SIGNAL(clicked()),this,SLOT(file_access_click()));
     connect(ui->file_rename,SIGNAL(clicked()),this,SLOT(file_access_click()));
     connect(ui->file_download,SIGNAL(clicked()),this,SLOT(file_access_click()));
+    //对应于    如果选择了无权限，则不能选其他的
     connect(ui->file_no_access,SIGNAL(clicked()),this,SLOT(file_no_access_click()));
+
+    //同上  这是针对   目录的
     connect(ui->dir_delete,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_new,SIGNAL(clicked()),this,SLOT(dir_access_click()));
     connect(ui->dir_rename,SIGNAL(clicked()),this,SLOT(dir_access_click()));
@@ -107,18 +113,18 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
     //为其赋值
     ui->id_value->setText(QString::number(ftpUser.getId()));
     ui->name_value->setText(ftpUser.getName());
-    if(ftpUser.getFtpGroup()==0){
+    if(ftpUser.getFtpGroup()==0){//未分组时用户的权限为主
         ui->group_value->setText("未分组");
         ui->path_value->setText(ftpUser.getPath());
         setFileAccess(ftpUser.getFile());
         setDirectoryAcccess(ftpUser.getDirectory());
-    }else{
+    }else{//当分组以后，用户组的设置高于用户，显示的就是用户组的对路径，权限的设置
         ftpGroup=sqlConnection->queryGroupById(ftpUser.getFtpGroup());
         ui->group_value->setText(ftpGroup.getName());
         ui->path_value->setText(ftpGroup.getPath());
         setFileAccess(ftpGroup.getFile());
         setDirectoryAcccess(ftpGroup.getDirectory());
-        ui->edit_access->setEnabled(false);
+        ui->edit_access->setEnabled(false);//设置编辑按钮不可见---因为用户不能修改其对应组的设置
     }
 
 }
@@ -126,7 +132,7 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
 /*
  * file_access点击
 */
-void SetUserGroupWindow::file_access_click(){
+void SetUserGroupWindow::file_access_click(){//选中了其他选择，则无权限就不能是被选中状态的
     ui->file_no_access->setCheckState(Qt::Unchecked);
 }
 
@@ -134,7 +140,7 @@ void SetUserGroupWindow::file_access_click(){
  * file_access点击
 */
 void SetUserGroupWindow::file_no_access_click(){
-    if(ui->file_no_access->isChecked()){
+    if(ui->file_no_access->isChecked()){//就是设置如果选中了无权限 file_no_access,那么其他选取就都不能选了
         ui->file_delete->setCheckState(Qt::Unchecked);
         ui->file_upload->setCheckState(Qt::Unchecked);
         ui->file_rename->setCheckState(Qt::Unchecked);
@@ -235,6 +241,9 @@ void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
     ui->edit_user->setEnabled(false);
     ui->delete_user->setEnabled(false);
 
+    //可编辑group权限
+    save_user_or_group_access=true;//表示现在编辑的是用户组的权限
+
     //使右边第一个菜单栏可见
     ui->groupBox_info->setEnabled(true);
 
@@ -247,14 +256,18 @@ void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
     //设置右边的第一个菜单栏的显示
     ui->label_id->setText("用户组ID");
     ui->label_name->setText("用户组名");
-    ui->label_group->setText("组员个数");
+    ui->label_group->setText("组员列表");
     ui->label_path->setText("根目录");
 
     //为其赋值
     ui->id_value->setText(QString::number(ftpGroup.getId()));
     ui->name_value->setText(ftpGroup.getName());
-//    ui->group_value->setText( QString::number(ftpGroup.getCount()));
+    ui->group_value->setText( "0");
     ui->path_value->setText(ftpGroup.getPath());
+
+    //还需要显示出当前用户组的权限设置
+    setFileAccess(ftpGroup.getFile());
+    setDirectoryAcccess(ftpGroup.getDirectory());
 }
 
 /*
@@ -304,10 +317,10 @@ void SetUserGroupWindow::edit_or_save_access(){
         ui->edit_access->setText("保存权限");
     }else{
         //保存权限
-        if(!save_user_or_group_access){
+        if(!save_user_or_group_access){//设置的是用户的权限
             saveUserAccess();
-        }else{
-
+        }else{//设置的是用户组的权限
+            saveGroupAccess();
         }
         edit_or_save=false;
         ui->file_access->setEnabled(false);
@@ -317,26 +330,48 @@ void SetUserGroupWindow::edit_or_save_access(){
 }
 
 /*
- * 保存用户权限
+ * 保存的是用户权限
 */
 void SetUserGroupWindow::saveUserAccess(){
     QString user_file_access=getFileAccess();
     QString user_dir_access=getDirAccess();
     if(user_file_access!=ftpUser.getFile()&&user_dir_access!=ftpUser.getDirectory()){
         if(!sqlConnection->updateUserFileAndDirAccess(ftpUser.getId(),user_file_access,user_dir_access)){
-            QMessageBox::warning(this,"错误","修改失败！");
+            QMessageBox::warning(this,"错误","修改失败！");//目录和文件权限都修改
         }
     }else if(user_file_access!=ftpUser.getFile()){
         if(!sqlConnection->updateUserFileAccess(ftpUser.getId(),user_file_access)){
-            QMessageBox::warning(this,"错误","修改失败！");
+            QMessageBox::warning(this,"错误","修改失败！");//修改文件权限
         }
     }else{
         if(!sqlConnection->updateUserDirAccess(ftpUser.getId(),user_dir_access)){
-            QMessageBox::warning(this,"错误","修改失败！");
+            QMessageBox::warning(this,"错误","修改失败！");//修改目录权限
         }
     }
 }
 
+/*
+ * 保存的是用户组权限
+*/
+void SetUserGroupWindow::saveGroupAccess(){
+    QString group_file_access=getFileAccess();//获取到当前设置的权限
+    QString group_dir_access=getDirAccess();
+    // qDebug()<<"界面设置的是"<<group_file_access<<group_dir_access;
+    if(group_file_access!=ftpGroup.getFile()&&group_dir_access!=ftpGroup.getDirectory()){//界面的与对象存的不一样，说明进行了修改，那就需要更新
+       // qDebug()<<"对象中存储的是"<<ftpGroup.getFile()<<ftpGroup.getDirectory();
+        if(!sqlConnection->updateGroupFileAndDirAccess(ftpGroup.getId(),group_file_access,group_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");//目录和文件权限都修改
+        }
+    }else if(group_file_access!=ftpUser.getFile()){
+        if(!sqlConnection->updateGroupFileAccess(ftpGroup.getId(),group_file_access)){
+            QMessageBox::warning(this,"错误","修改失败！");//修改文件权限
+        }
+    }else{
+        if(!sqlConnection->updateGroupDirAccess(ftpGroup.getId(),group_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");//修改目录权限
+        }
+    }
+}
 /*
  * 弹出新建用户界面
 */
@@ -398,7 +433,7 @@ QString SetUserGroupWindow::getFileAccess(){
     if(ui->file_no_access->isChecked()){
         return "0000";
     }else{
-        QString file_access="";
+        QString file_access="";//表示用户权限的字符串---针对各权限，0表示没选，1表示选了
         if(ui->file_delete->isChecked()){
             file_access+="1";
         }else{
