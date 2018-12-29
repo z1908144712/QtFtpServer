@@ -30,6 +30,9 @@ private:
     FtpAbout *ftpAbout;
     FtpSqlConnection *sqlConnection;
 
+    void startServer();
+    void stopServer();
+
 private slots:
     void onPeerIpChanged(const QString &peerIp);
     void trigerMenu(QAction*);

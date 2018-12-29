@@ -2,8 +2,7 @@
 #include "ftplistcommand.h"
 #include "ftpretrcommand.h"
 #include "ftpstorcommand.h"
-#include "sslserver.h"
-#include "dataconnection.h"
+
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -13,19 +12,15 @@
 #include <QEventLoop>
 #include <QDebug>
 #include <QTimer>
-#include <QSslSocket>
 #include <ftpcrypto.h>
 #include <ftpsqlconnection.h>
 
-FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
+FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
     this->sqlConnection=sqlConnection;
     this->socket = socket;
     this->logPrint=logPrint;
-    this->statusBar=statusBar;
-    user_counter++;
-    showStatusBar();
     isLoggedIn = false;
     encryptDataConnection = false;
     socket->setParent(this);
@@ -38,8 +33,8 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
 
 FtpControlConnection::~FtpControlConnection()
 {
-    user_counter--;
-    showStatusBar();
+    delete socket;
+    emit close(this);
 }
 
 void FtpControlConnection::acceptNewData()
@@ -487,8 +482,4 @@ qint64 FtpControlConnection::seekTo()
         QTextStream(commandParameters.toUtf8()) >> seekTo;
     }
     return seekTo;
-}
-
-void FtpControlConnection::showStatusBar(){
-    statusBar->showMessage("已连接用户"+QString::number(user_counter)+"个");
 }

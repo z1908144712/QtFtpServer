@@ -2,8 +2,7 @@
 
 #include <QFile>
 #include <QDir>
-#include <QDateTime>
-#include <QTimer>
+
 #include <QSslSocket>
 
 FtpListCommand::FtpListCommand(QObject *parent, const QString &fileName, bool nameListOnly) :

@@ -4,13 +4,13 @@
 #include <QObject>
 #include <QPointer>
 #include <QStatusBar>
+#include <QSslSocket>
 #include "logprint.h"
-#include <ftpuser.h>
-#include <ftpsqlconnection.h>
+#include "ftpuser.h"
+#include "ftpsqlconnection.h"
+#include "sslserver.h"
+#include "dataconnection.h"
 
-class QSslSocket;
-class FtpCommand;
-class DataConnection;
 
 // Implements the ftp control connection. Reads the ftp commands from the
 // control connection socket, parses each line and maps it to an implemented
@@ -21,12 +21,11 @@ class FtpControlConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection);
+    explicit FtpControlConnection(QObject *parent, QSslSocket *socket,LogPrint *logPrint,FtpSqlConnection *sqlConnection);
     ~FtpControlConnection();
 
-    static int user_counter;
-
 signals:
+    void close(FtpControlConnection*);
 
 public slots:
     // Slot used by the data connection handlers to send messages to the FTP
@@ -101,8 +100,6 @@ private:
     // allows to the client to continue partially downloaded/uploaded files.
     qint64 seekTo();
 
-    void showStatusBar();
-
     // The TCP (or SSL) socket of the control connection.
     QSslSocket *socket;
     // The current directory (i.e. CD) of the FTP server. Used for relative
@@ -127,7 +124,6 @@ private:
 
     LogPrint *logPrint;
 
-    QStatusBar *statusBar;
     FtpUser user;
     QString file="";          //permission of file
     QString directory="";     //permission of directory
