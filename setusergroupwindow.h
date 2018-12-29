@@ -49,6 +49,7 @@ private:
     void setFileAccess(QString file);
     void setDirectoryAcccess(QString directorty);
     void saveUserAccess();
+    void saveGroupAccess();
     QString getFileAccess();
     QString getDirAccess();
 
@@ -68,8 +69,11 @@ private slots:
     void user_list_item_click(const QModelIndex&);
     void group_list_item_click(const QModelIndex&);
     void edit_or_save_access();
+
+    //对权限控制界面的文件组件的设置
     void file_access_click();
     void file_no_access_click();
+    //与上面一样
     void dir_access_click();
     void dir_no_access_click();
 };

@@ -23,6 +23,9 @@ public:
     bool updateUserDirAccess(int id,QString dir);
     bool updateUserFileAndDirAccess(int id,QString file,QString dir);
     bool updateGroupBasic(FtpGroup group);//修改组的基本信息
+    bool updateGroupFileAccess(int id,QString file);//修改组的权限信息
+    bool updateGroupDirAccess(int id,QString dir);
+    bool updateGroupFileAndDirAccess(int id,QString file,QString dir);
     bool hasUserByName(QString name);
     bool deleteUserById(int id);
     bool deleteGroupById(int id);
