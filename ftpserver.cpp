@@ -9,28 +9,29 @@
 FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
-    server = new SslServer(this);
-    // In Qt4, QHostAddress::Any listens for IPv4 connections only, but as of
-    // Qt5, it now listens on all available interfaces, and
-    // QHostAddress::AnyIPv4 needs to be used if we want only IPv4 connections.
-#if QT_VERSION >= 0x050000
-    server->listen(QHostAddress::AnyIPv4, port);
-#else
-    server->listen(QHostAddress::Any, port);
-#endif
-    connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
+    this->port=port;
     this->onlyOneIpAllowed = onlyOneIpAllowed;
     this->logPrint=logPrint;
     this->statusBar=statusBar;
     this->sqlConnection=sqlConnection;
+    server = new SslServer(this);
+    connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
+    start();
 }
 
 FtpServer::~FtpServer(){
-    delete server;
+    statusBar->showMessage("");
+}
+
+void FtpServer::start(){
+    server->listen(QHostAddress::AnyIPv4, port);
+}
+
+void FtpServer::stop(){
+    server->close();
     for(int i=0;i<ftpControlConnections.length();i++){
         delete ftpControlConnections.at(i);
     }
-    statusBar->showMessage("");
 }
 
 bool FtpServer::isListening()
@@ -80,6 +81,6 @@ void FtpServer::startNewControlConnection()
 
 void FtpServer::deleteControlConnection(FtpControlConnection* ftpControlConnection){
     ftpControlConnections.removeOne(ftpControlConnection);
-    delete ftpControlConnection;
     statusBar->showMessage("当前用户数 "+QString::number(ftpControlConnections.length()));
 }
+

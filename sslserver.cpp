@@ -10,7 +10,6 @@ SslServer::SslServer(QObject *parent):
 }
 
 SslServer::~SslServer(){
-    this->close();
 }
 
 void SslServer::setLocalCertificateAndPrivateKey(QSslSocket *socket)

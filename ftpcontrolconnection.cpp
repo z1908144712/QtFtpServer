@@ -33,7 +33,6 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
 
 FtpControlConnection::~FtpControlConnection()
 {
-    delete socket;
     emit close(this);
 }
 

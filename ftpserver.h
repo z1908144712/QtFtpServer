@@ -44,6 +44,9 @@ private slots:
 
     void deleteControlConnection(FtpControlConnection *);
 
+    void start();
+    void stop();
+
 private:
 
     // The SSL server listen for incoming connections.
@@ -57,6 +60,7 @@ private:
     // refuse connections from any other IP. This makes sense because a mobile
     // phone is unlikely to be used from 2 places at once.
     bool onlyOneIpAllowed;
+    int port;
 
     LogPrint *logPrint;
 
