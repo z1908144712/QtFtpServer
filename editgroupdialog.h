@@ -3,7 +3,9 @@
 
 #include <QDialog>
 #include <ftpsqlconnection.h>
-
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QMessageBox>
 namespace Ui {
 class EditGroupDialog;
 }
@@ -19,13 +21,20 @@ public:
 private:
     Ui::EditGroupDialog *ui;
     FtpSqlConnection *sqlConnection;
+    QStandardItemModel *user_standardItemModel;
     FtpGroup ftpgroup;
+    FtpUser  ftpUser;
+    void showUserListInGroup();
+    void refresh_user();
 signals:
     void  refresh();
 private slots:
     void confirm();
     void cancel();
     void findfile();
+    void deleteuser();
+    void user_list_item_click(const QModelIndex&);
+
 };
 
 #endif // EDITGROUPDIALOG_H

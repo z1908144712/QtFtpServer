@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
         logPrint->print();
     }
     sqlConnection=new FtpSqlConnection("access.db","","");
+    //qDebug()<<sqlConnection->queryUserNumInGroup(3); 测试用
 }
 
 MainWindow::~MainWindow()
