@@ -10,9 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    sqlConnection=new FtpSqlConnection("access.db","","");
     ui->setupUi(this);
     logPrint=new LogPrint(ui->textEdit);
-    server=new FtpServer(this,21,false,logPrint,ui->statusBar);
+    server=new FtpServer(this,21,false,logPrint,ui->statusBar,sqlConnection);
     connect(server, SIGNAL(newPeerIp(QString)),this,SLOT(onPeerIpChanged(QString)));
     connect(ui->menuBar,SIGNAL(triggered(QAction*)),this,SLOT(trigerMenu(QAction*)));
     connect(this,SIGNAL(start()),server,SLOT(start()));
@@ -44,5 +45,38 @@ void MainWindow::trigerMenu(QAction* action){
 void MainWindow::onPeerIpChanged(const QString &peerIp)
 {
     logPrint->setText("Connected to " + peerIp);
+    logPrint->print();
+}
+/*
+ * 启动服务
+ */
+void MainWindow::startServer(){
+    emit start();
+    if (server->isListening()) {
+        ui->actionStart->setEnabled(false);
+        ui->actionStop->setEnabled(true);
+        QString ips=" (";
+        foreach (QString ip, FtpServer::lanIp()) {
+            ips+=" "+ip+" ";
+        }
+        ips+=")";
+        logPrint->setText("Server started! Listening at"+ips);
+        logPrint->print();
+    } else {
+        emit stop();
+        ui->actionStart->setEnabled(true);
+        ui->actionStop->setEnabled(false);
+        logPrint->setText("Server start failed!");
+        logPrint->print();
+    }
+}
+/*
+ * 关闭服务
+ */
+void MainWindow::stopServer(){
+    emit stop();
+    ui->actionStart->setEnabled(true);
+    ui->actionStop->setEnabled(false);
+    logPrint->setText("Server stoped!");
     logPrint->print();
 }
