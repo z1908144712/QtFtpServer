@@ -54,7 +54,8 @@
     <property name="title">
      <string>服务</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="actionStart"/>
+    <addaction name="actionStop"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -77,9 +78,9 @@
     <bool>true</bool>
    </property>
   </widget>
-  <action name="actionOpen">
+  <action name="actionStart">
    <property name="text">
-    <string>open</string>
+    <string>开启服务</string>
    </property>
    <property name="font">
     <font>
@@ -105,6 +106,11 @@
     <font>
      <family>微软雅黑</family>
     </font>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="text">
+    <string>停止服务</string>
    </property>
   </action>
  </widget>

@@ -2,14 +2,14 @@
 #define SSLSERVER_H
 
 #include <QTcpServer>
-
-class QSslSocket;
+#include <QSslSocket>
 
 class SslServer:public QTcpServer
 {
     Q_OBJECT
 public:
     explicit SslServer(QObject *parent);
+    ~SslServer();
     static void setLocalCertificateAndPrivateKey(QSslSocket *socket);
 
 private:

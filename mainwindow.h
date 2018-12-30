@@ -20,7 +20,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-
+signals:
+    void start();
+    void stop();
 
 private:
     Ui::MainWindow *ui;
@@ -29,6 +31,9 @@ private:
     SetUserGroupWindow *setUserGroupWindow;
     FtpAbout *ftpAbout;
     FtpSqlConnection *sqlConnection;
+
+    void startServer();
+    void stopServer();
 
 private slots:
     void onPeerIpChanged(const QString &peerIp);

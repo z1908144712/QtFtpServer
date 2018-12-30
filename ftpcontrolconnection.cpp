@@ -2,8 +2,7 @@
 #include "ftplistcommand.h"
 #include "ftpretrcommand.h"
 #include "ftpstorcommand.h"
-#include "sslserver.h"
-#include "dataconnection.h"
+
 
 #include <QFileInfo>
 #include <QDateTime>
@@ -13,19 +12,15 @@
 #include <QEventLoop>
 #include <QDebug>
 #include <QTimer>
-#include <QSslSocket>
 #include <ftpcrypto.h>
 #include <ftpsqlconnection.h>
 
-
-FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,QStatusBar *statusBar) :
+FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, LogPrint *logPrint,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
+    this->sqlConnection=sqlConnection;
     this->socket = socket;
     this->logPrint=logPrint;
-    this->statusBar=statusBar;
-    user_counter++;
-    showStatusBar();
     isLoggedIn = false;
     encryptDataConnection = false;
     socket->setParent(this);
@@ -38,8 +33,7 @@ FtpControlConnection::FtpControlConnection(QObject *parent, QSslSocket *socket, 
 
 FtpControlConnection::~FtpControlConnection()
 {
-    user_counter--;
-    showStatusBar();
+    emit close(this);
 }
 
 void FtpControlConnection::acceptNewData()
@@ -52,7 +46,7 @@ void FtpControlConnection::acceptNewData()
     // of using a for-loop until no more lines are available. This is done
     // so we don't block the event loop for a long time.
     processCommand(QString::fromUtf8(socket->readLine()).trimmed());
-    QTimer::singleShot(0, this, SLOT(acceptNewData()));
+    QTimer::singleShot(0, this, SLOT(acceptNewData()));   //不断接受操作命令
 }
 
 void FtpControlConnection::disconnectFromHost()
@@ -208,8 +202,9 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
     } else if ("RETR" == command) {                      //download a file
         if(file[3]=='1')
             retr(toLocalPath(commandParameters));
-        else
-            reply("error no permission to "+toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
     } else if ("REST" == command) {
         reply("350 Requested file action pending further information.");
     } else if ("NLST" == command) {
@@ -231,38 +226,44 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
     } else if ("STOR" == command) {                //upload a file
         if(file[2]=='1')
             stor(toLocalPath(commandParameters));
-        else
-            reply("error no permission to "+toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
     } else if ("MKD" == command) {                 //mkdir a directory
         if(directory[1]=='1')
             mkd(toLocalPath(commandParameters));
-        else
-            reply("error no permission to "+toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
     } else if ("RMD" == command) {                 //rmdir a directory
         if(directory[0]=='1')
             rmd(toLocalPath(commandParameters));
-        else
-            reply("error no permission to "+toLocalPath(commandParameters));
+        else{
+                reply("550 you have no access.");
+        }
     } else if ("DELE" == command) {                //delete a file
         if(file[0]=='1')
             dele(toLocalPath(commandParameters));
-        else
-            reply("error no permission to "+toLocalPath(commandParameters));
-    } else if ("RNFR" == command) {
+        else{
+                reply("550 you have no access.");
+        }
+    } else if ("RNFR" == command) {    //rename a file or directory
         QFileInfo f(toLocalPath(commandParameters));
         if(f.isDir())
         {
             if(directory[2]=='1')
                 reply("350 Requested file action pending further information.");
-            else
-                reply("error no permission to "+toLocalPath(commandParameters));
+            else{
+                    reply("550 you have no access.");
+            }
         }
         else if(f.isFile())
         {
-            if(directory[1]=='1')
+            if(file[1]=='1')
                 reply("350 Requested file action pending further information.");
-            else
-                reply("error no permission to "+toLocalPath(commandParameters));
+            else{
+                    reply("550 you have no access.");
+            }
         }
     } else if ("RNTO" == command) {                   //rename a file or directory
         rnto(toLocalPath(commandParameters));
@@ -405,7 +406,6 @@ void FtpControlConnection::pass(const QString &password)   //user input pwd
     QString commandParameters; //store username
     parseCommand(lastProcessedCommand, &command, &commandParameters);  //get username from lastProcessedCommand
     if("USER" == command){
-        FtpSqlConnection * sqlConnection =new FtpSqlConnection("access.db","","");
         user=sqlConnection->queryUserByName(commandParameters);
         QString crypto_password=FtpCrypto::cryptopassword(password);
         if(user.getPassword()==crypto_password){
@@ -481,8 +481,4 @@ qint64 FtpControlConnection::seekTo()
         QTextStream(commandParameters.toUtf8()) >> seekTo;
     }
     return seekTo;
-}
-
-void FtpControlConnection::showStatusBar(){
-    statusBar->showMessage("已连接用户"+QString::number(user_counter)+"个");
 }

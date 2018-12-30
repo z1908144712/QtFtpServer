@@ -1,28 +1,36 @@
 #include "ftpserver.h"
-#include "ftpcontrolconnection.h"
 #include "sslserver.h"
 
 #include <QDebug>
 #include <QNetworkInterface>
 #include <QHostInfo>
-#include <QSslSocket>
 
-FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar) :
+
+FtpServer::FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection) :
     QObject(parent)
 {
-    server = new SslServer(this);
-    // In Qt4, QHostAddress::Any listens for IPv4 connections only, but as of
-    // Qt5, it now listens on all available interfaces, and
-    // QHostAddress::AnyIPv4 needs to be used if we want only IPv4 connections.
-#if QT_VERSION >= 0x050000
-    server->listen(QHostAddress::AnyIPv4, port);
-#else
-    server->listen(QHostAddress::Any, port);
-#endif
-    connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
+    this->port=port;
     this->onlyOneIpAllowed = onlyOneIpAllowed;
     this->logPrint=logPrint;
     this->statusBar=statusBar;
+    this->sqlConnection=sqlConnection;
+    server = new SslServer(this);
+    connect(server, SIGNAL(newConnection()), this, SLOT(startNewControlConnection()));
+}
+
+FtpServer::~FtpServer(){
+    statusBar->showMessage("");
+}
+
+void FtpServer::start(){
+    server->listen(QHostAddress::AnyIPv4, port);
+}
+
+void FtpServer::stop(){
+    server->close();
+    for(int i=0;i<ftpControlConnections.length();i++){
+        delete ftpControlConnections.at(i);
+    }
 }
 
 bool FtpServer::isListening()
@@ -64,5 +72,14 @@ void FtpServer::startNewControlConnection()
     }
 
     // Create a new FTP control connection on this socket.
-    new FtpControlConnection(this, socket, logPrint,statusBar);
+    FtpControlConnection *ftpControlConnection=new FtpControlConnection(this, socket, logPrint,sqlConnection);
+    connect(ftpControlConnection,SIGNAL(close(FtpControlConnection*)),this,SLOT(deleteControlConnection(FtpControlConnection*)));
+    ftpControlConnections.append(ftpControlConnection);
+    statusBar->showMessage("当前用户数 "+QString::number(ftpControlConnections.length()));
 }
+
+void FtpServer::deleteControlConnection(FtpControlConnection* ftpControlConnection){
+    ftpControlConnections.removeOne(ftpControlConnection);
+    statusBar->showMessage("当前用户数 "+QString::number(ftpControlConnections.length()));
+}
+

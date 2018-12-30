@@ -1,9 +1,9 @@
 #ifndef FTPSTORCOMMAND_H
 #define FTPSTORCOMMAND_H
 
+#include <QFile>
 #include "ftpcommand.h"
 
-class QFile;
 
 // Implements the STOR and APPE commands. Used to upload files to the ftp
 // server.

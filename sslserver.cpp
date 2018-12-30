@@ -1,11 +1,15 @@
 #include "sslserver.h"
 
-#include <QSslSocket>
+
 #include <QSslKey>
+#include <QDebug>
 
 SslServer::SslServer(QObject *parent):
     QTcpServer(parent)
 {
+}
+
+SslServer::~SslServer(){
 }
 
 void SslServer::setLocalCertificateAndPrivateKey(QSslSocket *socket)

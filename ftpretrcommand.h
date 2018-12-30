@@ -2,8 +2,7 @@
 #define FTPRETRCOMMAND_H
 
 #include "ftpcommand.h"
-
-class QFile;
+#include <QFile>
 
 // Implements the RETR command. Used to download files from the ftp server.
 

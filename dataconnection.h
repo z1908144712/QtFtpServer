@@ -1,9 +1,9 @@
 #ifndef DATACONNECTION_H
 #define DATACONNECTION_H
 
-class SslServer;
-class QSslSocket;
-class FtpCommand;
+#include "sslserver.h"
+#include "QSslSocket"
+#include "ftpcommand.h"
 
 #include <QObject>
 #include <QPointer>

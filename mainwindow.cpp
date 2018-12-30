@@ -15,20 +15,9 @@ MainWindow::MainWindow(QWidget *parent) :
     server=new FtpServer(this,21,false,logPrint,ui->statusBar);
     connect(server, SIGNAL(newPeerIp(QString)),this,SLOT(onPeerIpChanged(QString)));
     connect(ui->menuBar,SIGNAL(triggered(QAction*)),this,SLOT(trigerMenu(QAction*)));
-    if (server->isListening()) {
-        QString ips=" (";
-        foreach (QString ip, FtpServer::lanIp()) {
-            ips+=" "+ip+" ";
-        }
-        ips+=")";
-        logPrint->setText("Listening at"+ips);
-        logPrint->print();
-    } else {
-        logPrint->setText("Not listening");
-        logPrint->print();
-    }
-    sqlConnection=new FtpSqlConnection("access.db","","");
-    //qDebug()<<sqlConnection->queryUserNumInGroup(3); 测试用
+    connect(this,SIGNAL(start()),server,SLOT(start()));
+    connect(this,SIGNAL(stop()),server,SLOT(stop()));
+    startServer();
 }
 
 MainWindow::~MainWindow()
