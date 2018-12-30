@@ -23,9 +23,11 @@ public:
     bool updateUserDirAccess(int id,QString dir);
     bool updateUserFileAndDirAccess(int id,QString file,QString dir);
     bool updateGroupBasic(FtpGroup group);//修改组的基本信息
+
     bool updateGroupFileAccess(int id,QString file);//修改组的权限信息
     bool updateGroupDirAccess(int id,QString dir);
     bool updateGroupFileAndDirAccess(int id,QString file,QString dir);
+
     bool hasUserByName(QString name);
     bool deleteUserById(int id);
     bool deleteGroupById(int id);
@@ -36,8 +38,11 @@ public:
     FtpUser queryUserById(int id);
     FtpGroup queryGroupByName(QString name);
     FtpGroup queryGroupById(int id);
+    int queryUserNumInGroup(int id);//查询组里有多少用户
+
     QList<QMap<QString,QString>> listGroupNames();
     QList<QMap<QString,QString>> listUserNames();
+     QList<QMap<QString,QString>> listUserNamesInGroup(int id);//列出用户组中的用户
 private:
     QSqlDatabase database;
 };

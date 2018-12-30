@@ -468,6 +468,28 @@ int FtpSqlConnection::queryGroupIdByName(QString name){
 }
 
 /*
+ * 查询组里有多少用户
+ * @return  int
+*/
+
+int FtpSqlConnection::queryUserNumInGroup(int id){
+    QString sql="select count(*)  from ftpuser where ftpgroup=:id";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return 0;
+    }else{
+        if(sqlQuery.next()){
+            return sqlQuery.value(0).toInt();
+        }else{
+            return 0;
+        }
+    }
+}
+
+/*
  * 从ftpgroup查询全部的id,name
  * @return  QList<QMap<QString,QStirng>>
 */
@@ -495,6 +517,29 @@ QList<QMap<QString,QString>> FtpSqlConnection::listUserNames(){
     QSqlQuery sqlQuery;
     QList<QMap<QString,QString>> list;
     if(!sqlQuery.exec("select id,name from ftpuser;")){
+        qDebug()<<sqlQuery.lastError();
+    }else{
+        while (sqlQuery.next()) {
+            QMap<QString,QString> map;
+            map.insert("id",sqlQuery.value(0).toString());
+            map.insert("name",sqlQuery.value(1).toString());
+            list.append(map);
+        }
+    }
+    return list;
+}
+
+/*
+ * 查询用户组中的用户的id,name
+ * @return  QList<QMap<QString,QStirng>>
+*/
+QList<QMap<QString,QString>> FtpSqlConnection::listUserNamesInGroup(int id){
+    QString sql="select id,name from ftpuser where ftpgroup=:id";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
+    QList<QMap<QString,QString>> list;
+    if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
     }else{
         while (sqlQuery.next()) {

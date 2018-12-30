@@ -256,13 +256,14 @@ void SetUserGroupWindow::group_list_item_click(const QModelIndex &index){
     //设置右边的第一个菜单栏的显示
     ui->label_id->setText("用户组ID");
     ui->label_name->setText("用户组名");
-    ui->label_group->setText("组员列表");
+    ui->label_group->setText("组员个数");
     ui->label_path->setText("根目录");
 
     //为其赋值
     ui->id_value->setText(QString::number(ftpGroup.getId()));
     ui->name_value->setText(ftpGroup.getName());
-    ui->group_value->setText( "0");
+    int num=sqlConnection->queryUserNumInGroup(ftpGroup.getId());
+    ui->group_value->setText(QString::number(num));
     ui->path_value->setText(ftpGroup.getPath());
 
     //还需要显示出当前用户组的权限设置
@@ -303,6 +304,27 @@ void SetUserGroupWindow::refresh_user(){
 */
 void SetUserGroupWindow::refresh_group(){
     showGroupList();
+    ui->edit_user->setEnabled(false);
+    ui->delete_user->setEnabled(false);
+    ui->groupBox_info->setEnabled(false);
+    ui->id_value->setText("");
+    ui->name_value->setText("");
+    ui->group_value->setText("");
+    ui->path_value->setText("");
+    ui->file_access->setEnabled(false);
+    ui->dir_access->setEnabled(false);
+    ui->file_delete->setCheckState(Qt::Unchecked);
+    ui->file_upload->setCheckState(Qt::Unchecked);
+    ui->file_rename->setCheckState(Qt::Unchecked);
+    ui->file_download->setCheckState(Qt::Unchecked);
+    ui->file_no_access->setCheckState(Qt::Unchecked);
+    ui->dir_delete->setCheckState(Qt::Unchecked);
+    ui->dir_new->setCheckState(Qt::Unchecked);
+    ui->dir_rename->setCheckState(Qt::Unchecked);
+    ui->dir_no_access->setCheckState(Qt::Unchecked);
+    ui->edit_access->setEnabled(false);
+    ui->edit_access->setText("编辑权限");
+    edit_or_save=false;
 }
 
 /*

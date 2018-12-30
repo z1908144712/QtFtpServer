@@ -36,10 +36,6 @@ void MainWindow::trigerMenu(QAction* action){
     }else if(action==ui->actionAbout){
         ftpAbout=new FtpAbout(this);
         ftpAbout->exec();
-    }else if(action==ui->actionStart){
-        startServer();
-    }else if(action==ui->actionStop){
-        stopServer();
     }
 }
 
@@ -51,10 +47,9 @@ void MainWindow::onPeerIpChanged(const QString &peerIp)
     logPrint->setText("Connected to " + peerIp);
     logPrint->print();
 }
-
 /*
  * 启动服务
-*/
+ */
 void MainWindow::startServer(){
     emit start();
     if (server->isListening()) {
@@ -75,10 +70,9 @@ void MainWindow::startServer(){
         logPrint->print();
     }
 }
-
 /*
  * 关闭服务
-*/
+ */
 void MainWindow::stopServer(){
     emit stop();
     ui->actionStart->setEnabled(true);
