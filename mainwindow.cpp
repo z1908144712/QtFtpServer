@@ -36,6 +36,10 @@ void MainWindow::trigerMenu(QAction* action){
     }else if(action==ui->actionAbout){
         ftpAbout=new FtpAbout(this);
         ftpAbout->exec();
+    }else if(action==ui->actionStart){
+        startServer();
+    }else if(action==ui->actionStop){
+        stopServer();
     }
 }
 
