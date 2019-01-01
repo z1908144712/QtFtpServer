@@ -115,7 +115,12 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
     ui->name_value->setText(ftpUser.getName());
     if(ftpUser.getFtpGroup()==0){//未分组时用户的权限为主
         ui->group_value->setText("未分组");
-        ui->path_value->setText(ftpUser.getPath());
+        if(ftpUser.getPath().isEmpty()){
+            ui->path_value->setText("未指定");
+            ui->edit_access->setEnabled(false);
+        }else{
+            ui->path_value->setText(ftpUser.getPath());
+        }
         setFileAccess(ftpUser.getFile());
         setDirectoryAcccess(ftpUser.getDirectory());
     }else{//当分组以后，用户组的设置高于用户，显示的就是用户组的对路径，权限的设置

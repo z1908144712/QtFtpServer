@@ -75,11 +75,11 @@ void FtpServer::startNewControlConnection()
     FtpControlConnection *ftpControlConnection=new FtpControlConnection(this, socket, logPrint,sqlConnection);
     connect(ftpControlConnection,SIGNAL(close(FtpControlConnection*)),this,SLOT(deleteControlConnection(FtpControlConnection*)));
     ftpControlConnections.append(ftpControlConnection);
-    statusBar->showMessage("当前用户数 "+QString::number(ftpControlConnections.length()));
+    statusBar->showMessage("当前连接数 "+QString::number(ftpControlConnections.length()));
 }
 
 void FtpServer::deleteControlConnection(FtpControlConnection* ftpControlConnection){
     ftpControlConnections.removeOne(ftpControlConnection);
-    statusBar->showMessage("当前用户数 "+QString::number(ftpControlConnections.length()));
+    statusBar->showMessage("当前连接数 "+QString::number(ftpControlConnections.length()));
 }
 

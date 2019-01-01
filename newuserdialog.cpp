@@ -3,6 +3,7 @@
 #include <QList>
 #include <QMap>
 #include <QDebug>
+#include <QMessageBox>
 #include "ftpuser.h"
 #include "ftpcrypto.h"
 
@@ -41,23 +42,33 @@ void NewUserDialog::confirm(){
     path=ui->path->text().trimmed();
     group=ui->groups->currentIndex();
     if(!username.isEmpty()&&!password1.isEmpty()&&!password2.isEmpty()){
-        if(password1==password2){
-            QString crypto_password=FtpCrypto::cryptopassword(password1);
-            if(group==0){
-                if(!path.isEmpty()){
-                    if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
+        if(sqlConnection->hasUserByName(username)){
+             QMessageBox::warning(this,"错误","该用户已存在！");
+        }else{
+            if(password1==password2){
+                QString crypto_password=FtpCrypto::cryptopassword(password1);
+                if(group==0){
+                    if(!path.isEmpty()){
+                        if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,path,"0000","000"))){
+                            emit refresh();
+                            cancel();
+                        }
+                    }else{
+                        QMessageBox::warning(this,"错误","信息未完善！");
+                    }
+                }else{
+                    group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
+                    if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","0000","000"))){
                         emit refresh();
                         cancel();
                     }
                 }
             }else{
-                group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","0000","000"))){
-                    emit refresh();
-                    cancel();
-                }
+                QMessageBox::warning(this,"错误","两次输入的密码不一致！");
             }
         }
+    }else{
+        QMessageBox::warning(this,"错误","信息未完善！");
     }
 }
 
