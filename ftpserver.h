@@ -5,10 +5,12 @@
 #include <QSet>
 #include <QList>
 #include <QStatusBar>
+#include <QSslSocket>
 #include "logprint.h"
-#include <ftpsqlconnection.h>
+#include "ftpsqlconnection.h"
+#include "ftpcontrolconnection.h"
 
-class SslServer;
+
 
 // The ftp server. Listens on a port, and starts a new control connection each
 // time it gets connected.
@@ -18,6 +20,7 @@ class FtpServer : public QObject
     Q_OBJECT
 public:
     explicit FtpServer(QObject *parent,int port,bool onlyOneIpAllowed,LogPrint *logPrint,QStatusBar *statusBar,FtpSqlConnection *sqlConnection);
+    ~FtpServer();
 
     // Whether or not the server is listening for incoming connections. If it
     // is not currently listening then there was an error - probably no
@@ -27,8 +30,6 @@ public:
 
     // Get the LAN IP of the host, e.g. "192.168.1.10".
     static QList<QString> lanIp();
-
-    static int user_counter;
 
 signals:
     // A connection from a new IP has been established. This signal is emitted
@@ -40,6 +41,11 @@ signals:
 private slots:
     // Called by the SSL server when we have received a new connection.
     void startNewControlConnection();
+
+    void deleteControlConnection(FtpControlConnection *);
+
+    void start();
+    void stop();
 
 private:
 
@@ -54,11 +60,13 @@ private:
     // refuse connections from any other IP. This makes sense because a mobile
     // phone is unlikely to be used from 2 places at once.
     bool onlyOneIpAllowed;
+    int port;
 
     LogPrint *logPrint;
 
     QStatusBar *statusBar;
     FtpSqlConnection *sqlConnection;
+    QList<FtpControlConnection*> ftpControlConnections;
 
 };
 

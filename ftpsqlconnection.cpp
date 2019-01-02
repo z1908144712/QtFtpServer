@@ -208,6 +208,64 @@ bool FtpSqlConnection::updateGroupBasic(FtpGroup group){
          return true;
      }
 }
+
+
+/*
+ * ftpgroup更新文件权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupFileAccess(int id, QString file){
+    QString sql="update ftpgroup set file=:file where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpgroup更新目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupDirAccess(int id, QString dir){
+    QString sql="update ftpgroup set directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        return true;
+    }
+}
+
+/*
+ * ftpgroup更新文件和目录权限
+ * @return bool
+*/
+bool FtpSqlConnection::updateGroupFileAndDirAccess(int id, QString file, QString dir){
+    QString sql="update ftpgroup set file=:file,directory=:directory where id=:id;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":file",file);
+    sqlQuery.bindValue(":directory",dir);
+    sqlQuery.bindValue(":id",id);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return false;
+    }else{
+        //qDebug()<<"修改成功，修改为"<<file<<dir;
+        return true;
+    }
+}
+
 /*
  * ftpgroup插入数据
  * @return bool
@@ -388,6 +446,23 @@ QString FtpSqlConnection::queryGroupPathByName(QString name){
     }
 }
 
+QString FtpSqlConnection::queryGroupPathByName(QString name){
+    QString sql="select path from ftpgroup where name=:name;";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":name",name);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return "";
+    }else{
+        if(sqlQuery.next()){
+            return sqlQuery.value(0).toString();
+        }else{
+            return "";
+        }
+    }
+}
+
 /*
  * 根据name从ftpgroup查询id
  * @return  int
@@ -397,6 +472,28 @@ int FtpSqlConnection::queryGroupIdByName(QString name){
     QSqlQuery sqlQuery;
     sqlQuery.prepare(sql);
     sqlQuery.bindValue(":name",name);
+    if(!sqlQuery.exec()){
+        qDebug()<<sqlQuery.lastError();
+        return 0;
+    }else{
+        if(sqlQuery.next()){
+            return sqlQuery.value(0).toInt();
+        }else{
+            return 0;
+        }
+    }
+}
+
+/*
+ * 查询组里有多少用户
+ * @return  int
+*/
+
+int FtpSqlConnection::queryUserNumInGroup(int id){
+    QString sql="select count(*)  from ftpuser where ftpgroup=:id";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
     if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
         return 0;
@@ -437,6 +534,29 @@ QList<QMap<QString,QString>> FtpSqlConnection::listUserNames(){
     QSqlQuery sqlQuery;
     QList<QMap<QString,QString>> list;
     if(!sqlQuery.exec("select id,name from ftpuser;")){
+        qDebug()<<sqlQuery.lastError();
+    }else{
+        while (sqlQuery.next()) {
+            QMap<QString,QString> map;
+            map.insert("id",sqlQuery.value(0).toString());
+            map.insert("name",sqlQuery.value(1).toString());
+            list.append(map);
+        }
+    }
+    return list;
+}
+
+/*
+ * 查询用户组中的用户的id,name
+ * @return  QList<QMap<QString,QStirng>>
+*/
+QList<QMap<QString,QString>> FtpSqlConnection::listUserNamesInGroup(int id){
+    QString sql="select id,name from ftpuser where ftpgroup=:id";
+    QSqlQuery sqlQuery;
+    sqlQuery.prepare(sql);
+    sqlQuery.bindValue(":id",id);
+    QList<QMap<QString,QString>> list;
+    if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
     }else{
         while (sqlQuery.next()) {

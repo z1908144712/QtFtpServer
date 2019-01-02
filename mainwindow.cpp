@@ -16,19 +16,9 @@ MainWindow::MainWindow(QWidget *parent) :
     server=new FtpServer(this,21,false,logPrint,ui->statusBar,sqlConnection);
     connect(server, SIGNAL(newPeerIp(QString)),this,SLOT(onPeerIpChanged(QString)));
     connect(ui->menuBar,SIGNAL(triggered(QAction*)),this,SLOT(trigerMenu(QAction*)));
-    if (server->isListening()) {
-        QString ips=" (";
-        foreach (QString ip, FtpServer::lanIp()) {
-            ips+=" "+ip+" ";
-        }
-        ips+=")";
-        logPrint->setText("Listening at"+ips);
-        logPrint->print();
-    } else {
-        logPrint->setText("Not listening");
-        logPrint->print();
-    }
-
+    connect(this,SIGNAL(start()),server,SLOT(start()));
+    connect(this,SIGNAL(stop()),server,SLOT(stop()));
+    startServer();
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +36,10 @@ void MainWindow::trigerMenu(QAction* action){
     }else if(action==ui->actionAbout){
         ftpAbout=new FtpAbout(this);
         ftpAbout->exec();
+    }else if(action==ui->actionStart){
+        startServer();
+    }else if(action==ui->actionStop){
+        stopServer();
     }
 }
 
@@ -55,5 +49,38 @@ void MainWindow::trigerMenu(QAction* action){
 void MainWindow::onPeerIpChanged(const QString &peerIp)
 {
     logPrint->setText("Connected to " + peerIp);
+    logPrint->print();
+}
+/*
+ * 启动服务
+ */
+void MainWindow::startServer(){
+    emit start();
+    if (server->isListening()) {
+        ui->actionStart->setEnabled(false);
+        ui->actionStop->setEnabled(true);
+        QString ips=" (";
+        foreach (QString ip, FtpServer::lanIp()) {
+            ips+=" "+ip+" ";
+        }
+        ips+=")";
+        logPrint->setText("Server started! Listening at"+ips);
+        logPrint->print();
+    } else {
+        emit stop();
+        ui->actionStart->setEnabled(true);
+        ui->actionStop->setEnabled(false);
+        logPrint->setText("Server start failed!");
+        logPrint->print();
+    }
+}
+/*
+ * 关闭服务
+ */
+void MainWindow::stopServer(){
+    emit stop();
+    ui->actionStart->setEnabled(true);
+    ui->actionStop->setEnabled(false);
+    logPrint->setText("Server stoped!");
     logPrint->print();
 }

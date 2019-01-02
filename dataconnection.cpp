@@ -1,7 +1,6 @@
 #include "dataconnection.h"
 #include "sslserver.h"
-#include "ftpcommand.h"
-#include <QSslSocket>
+
 
 DataConnection::DataConnection(QObject *parent) :
     QObject(parent)

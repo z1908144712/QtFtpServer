@@ -23,7 +23,11 @@ EditUserDialog::EditUserDialog(QWidget *parent,FtpSqlConnection *sqlConnection,F
         }
         ftpgroup="未分组";
         ui->groups->setCurrentText("未分组");
-        ui->path->setText(ftpUser.getPath());
+        if(ftpUser.getPath().isEmpty()){
+            ui->path->setText("未指定");
+        }else{
+            ui->path->setText(ftpUser.getPath());
+        }
     }else{
         for(int i=0;i<list.size();i++){
             ui->groups->insertItem(i,list.at(i)["name"]);
@@ -80,7 +84,7 @@ void EditUserDialog::confirm(){
             if(group!=ftpgroup){
                 ftpUser.setFtpGroup(sqlConnection->queryGroupIdByName(group));
             }
-            if(path!=ftpUser.getPath()){
+            if(path!="未指定"&&path!=ftpUser.getPath()){
                 ftpUser.setPath(path);
             }
             if(!sqlConnection->updateUserBasic(ftpUser)){
@@ -91,7 +95,16 @@ void EditUserDialog::confirm(){
             }
         }
     }else{
-        QMessageBox::warning(this,"错误","不能为空！");
+        QMessageBox::warning(this,"错误","信息未完善！");
+        if(username.isEmpty()){
+            ui->username->setText(ftpUser.getName());
+        }
+        if(password1.isEmpty()){
+            ui->password1->setText(ftpUser.getPassword());
+        }
+        if(password2.isEmpty()){
+            ui->password2->setText(ftpUser.getPassword());
+        }
     }
 }
 
@@ -101,5 +114,13 @@ void EditUserDialog::cancel(){
 }
 
 void EditUserDialog::combobox_item_changed(const QString &group){
-    ui->path->setText(sqlConnection->queryGroupPathByName(group));
+    if(group=="未分组"){
+        if(ftpUser.getPath().isEmpty()){
+            ui->path->setText("未指定");
+        }else{
+            ui->path->setText(ftpUser.getPath());
+        }
+    }else{
+        ui->path->setText(sqlConnection->queryGroupPathByName(group));
+    }
 }

@@ -2,9 +2,9 @@
 #define FTPLISTCOMMAND_H
 
 #include "ftpcommand.h"
-
-class QTimer;
-class QFileInfo;
+#include <QDateTime>
+#include <QTimer>
+#include <QFileInfo>
 typedef QList<QFileInfo> QFileInfoList;
 
 // Implements the LIST command. Prints out a listing of the given directory, in

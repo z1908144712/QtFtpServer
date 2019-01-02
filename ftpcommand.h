@@ -2,8 +2,8 @@
 #define FTPCOMMAND_H
 
 #include <QObject>
+#include <QSslSocket>
 
-class QSslSocket;
 
 class FtpCommand:public QObject
 {
