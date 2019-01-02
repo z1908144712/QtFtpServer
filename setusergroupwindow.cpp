@@ -129,7 +129,7 @@ void SetUserGroupWindow::user_list_item_click(const QModelIndex &index){
         ui->path_value->setText(ftpGroup.getPath());
         setFileAccess(ftpGroup.getFile());
         setDirectoryAcccess(ftpGroup.getDirectory());
-        ui->edit_access->setEnabled(false);//设置编辑按钮不可见---因为用户不能修改其对应组的设置
+        ui->edit_access->setEnabled(false);
     }
 
 }
@@ -357,6 +357,27 @@ void SetUserGroupWindow::edit_or_save_access(){
 }
 
 /*
+ * 保存用户权限
+*/
+void SetUserGroupWindow::saveUserAccess(){
+    QString user_file_access=getFileAccess();
+    QString user_dir_access=getDirAccess();
+    if(user_file_access!=ftpUser.getFile()&&user_dir_access!=ftpUser.getDirectory()){
+        if(!sqlConnection->updateUserFileAndDirAccess(ftpUser.getId(),user_file_access,user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else if(user_file_access!=ftpUser.getFile()){
+        if(!sqlConnection->updateUserFileAccess(ftpUser.getId(),user_file_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }else{
+        if(!sqlConnection->updateUserDirAccess(ftpUser.getId(),user_dir_access)){
+            QMessageBox::warning(this,"错误","修改失败！");
+        }
+    }
+}
+
+/*
  * 保存的是用户权限
 */
 void SetUserGroupWindow::saveUserAccess(){
@@ -460,7 +481,7 @@ QString SetUserGroupWindow::getFileAccess(){
     if(ui->file_no_access->isChecked()){
         return "0000";
     }else{
-        QString file_access="";//表示用户权限的字符串---针对各权限，0表示没选，1表示选了
+        QString file_access="";
         if(ui->file_delete->isChecked()){
             file_access+="1";
         }else{
