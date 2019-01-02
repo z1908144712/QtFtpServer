@@ -15,7 +15,7 @@ NewUserDialog::NewUserDialog(QWidget *parent,FtpSqlConnection *sqlConnection) :
 {
     ui->setupUi(this);
     this->sqlConnection=sqlConnection;
-    QList<QMap<QString,QString>> list=this->sqlConnection->listGroupNames();
+    QList<QMap<QString,QString>> list=this->sqlConnection->listGroupNames();//这是用户列表
     ui->groups->insertItem(0,"默认");
     for(int i=0;i<list.size();i++){
         ui->groups->insertItem(i+1,list.at(i)["name"]);
@@ -52,7 +52,7 @@ void NewUserDialog::confirm(){
                 }
             }else{
                 group=sqlConnection->queryGroupIdByName(ui->groups->currentText());
-                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","",""))){
+                if(sqlConnection->insertUser(FtpUser(username,crypto_password,group,"","0000","000"))){
                     emit refresh();
                     cancel();
                 }
