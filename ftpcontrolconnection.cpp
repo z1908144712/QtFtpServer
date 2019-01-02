@@ -253,7 +253,7 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         else{
                 reply("550 you have no access.");
         }
-    } else if ("RNFR" == command) {    //rename a file or directory
+    } else if ("RNFR" == command) {                    //rename a file or directory
         QFileInfo f(toLocalPath(commandParameters));
         if(f.isDir())
         {
