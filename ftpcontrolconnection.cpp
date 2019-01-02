@@ -209,7 +209,7 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
         if(file[3]=='1')
             retr(toLocalPath(commandParameters));
         else{
-                reply("550 you have no access.");
+            reply("550 you have no access to download a file.");
         }
     } else if ("REST" == command) {
         reply("350 Requested file action pending further information.");
@@ -230,28 +230,28 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
     } else if ("NOOP" == command) {
         reply("200 Command okay.");
     } else if ("STOR" == command) {                //upload a file
-        if(file[2]=='1')
+        if(file[1]=='1')
             stor(toLocalPath(commandParameters));
         else{
-                reply("550 you have no access.");
+            reply("550 you have no access to upload a file.");
         }
     } else if ("MKD" == command) {                 //mkdir a directory
         if(directory[1]=='1')
             mkd(toLocalPath(commandParameters));
         else{
-                reply("550 you have no access.");
+                reply("550 you have no access to mkdir a directory.");
         }
     } else if ("RMD" == command) {                 //rmdir a directory
         if(directory[0]=='1')
             rmd(toLocalPath(commandParameters));
         else{
-                reply("550 you have no access.");
+                reply("550 you have no access to rmdir a directory.");
         }
     } else if ("DELE" == command) {                //delete a file
         if(file[0]=='1')
             dele(toLocalPath(commandParameters));
         else{
-                reply("550 you have no access.");
+                reply("550 you have no access to delete a file.");
         }
     } else if ("RNFR" == command) {                    //rename a file or directory
         QFileInfo f(toLocalPath(commandParameters));
@@ -260,15 +260,15 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
             if(directory[2]=='1')
                 reply("350 Requested file action pending further information.");
             else{
-                    reply("550 you have no access.");
+                    reply("550 you have no access to rename a directory.");
             }
         }
         else if(f.isFile())
         {
-            if(file[1]=='1')
+            if(file[2]=='1')
                 reply("350 Requested file action pending further information.");
             else{
-                    reply("550 you have no access.");
+                    reply("550 you have no access to rename a file.");
             }
         }
     } else if ("RNTO" == command) {
