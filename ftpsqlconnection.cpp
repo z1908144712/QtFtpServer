@@ -446,23 +446,6 @@ QString FtpSqlConnection::queryGroupPathByName(QString name){
     }
 }
 
-QString FtpSqlConnection::queryGroupPathByName(QString name){
-    QString sql="select path from ftpgroup where name=:name;";
-    QSqlQuery sqlQuery;
-    sqlQuery.prepare(sql);
-    sqlQuery.bindValue(":name",name);
-    if(!sqlQuery.exec()){
-        qDebug()<<sqlQuery.lastError();
-        return "";
-    }else{
-        if(sqlQuery.next()){
-            return sqlQuery.value(0).toString();
-        }else{
-            return "";
-        }
-    }
-}
-
 /*
  * 根据name从ftpgroup查询id
  * @return  int
