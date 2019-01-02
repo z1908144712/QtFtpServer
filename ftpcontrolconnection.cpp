@@ -271,7 +271,7 @@ void FtpControlConnection::processCommand(const QString &entireCommand)
                     reply("550 you have no access.");
             }
         }
-    } else if ("RNTO" == command) {                   //rename a file or directory
+    } else if ("RNTO" == command) {
         rnto(toLocalPath(commandParameters));
     } else if ("APPE" == command) {
         stor(toLocalPath(commandParameters), true);
