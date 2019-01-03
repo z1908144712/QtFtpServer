@@ -110,7 +110,6 @@ void EditUserDialog::confirm(){
 
 void EditUserDialog::cancel(){
     this->close();
-    emit refresh();
 }
 
 void EditUserDialog::combobox_item_changed(const QString &group){
