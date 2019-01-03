@@ -409,12 +409,15 @@ void FtpControlConnection::pass(const QString &password)   //user input pwd
         user=sqlConnection->queryUserByName(commandParameters);
         QString crypto_password=FtpCrypto::cryptopassword(password);
         if(user.getPassword()==crypto_password){
-                reply("230 You are logged in.");
-                isLoggedIn = true;
                 if(user.getFtpGroup()==0) {     //ftpgroup==0
                     file=user.getFile();
                     directory=user.getDirectory();
                     path=user.getPath();
+                    if(path==""){
+                        reply("530 rootPath is null.");
+                        return;
+                    }
+
                 }
                 else {                            //ftpgroup!=0
                     group=sqlConnection->queryGroupById(user.getFtpGroup());
@@ -423,8 +426,10 @@ void FtpControlConnection::pass(const QString &password)   //user input pwd
                     path=group.getPath();
                 }
                 rootPath=path;
+                reply("230 You are logged in.");
+                isLoggedIn = true;
         }
-        else{
+        else {
             reply("530 User name or password was incorrect.");
         }
     }
