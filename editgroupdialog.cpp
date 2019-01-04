@@ -33,15 +33,20 @@ void EditGroupDialog::confirm(){
   //将修改后的值保存至当前对象
     ftpgroup.setName(ui->groupname->text());
     ftpgroup.setPath(ui->path->text());
-    qDebug()<<ftpgroup.getName();
-    qDebug()<<ftpgroup.getPath();
-    if(sqlConnection->updateGroupBasic(ftpgroup)){
-        emit refresh();
-        cancel();
+    if(sqlConnection->hasGroupByName(ftpgroup.getName())){
+        QPalette pe;
+         pe.setColor(QPalette::WindowText,Qt::red);
+        ui->inform->setPalette(pe);
+        ui->inform->setText("用户组名已存在！");
+    }
+    else{
+        if(sqlConnection->updateGroupBasic(ftpgroup)){
+            emit refresh();
+            cancel();
+
+        }
 
     }
-
-
 }
 
 /*
@@ -79,6 +84,7 @@ void EditGroupDialog::deleteuser(){
     if(!sqlConnection->updateUserBasic(ftpUser)){//更新数据库
         QMessageBox::warning(this,"错误","修改失败！");
     }else{  //刷新用户界面
+        ui->deleteuser->setEnabled(false);
     showUserListInGroup();
     }
 }

@@ -21,17 +21,37 @@ NewGroupDialog::~NewGroupDialog()
 
 
 void NewGroupDialog::confirm()
-{
-    groupname=ui->groupname->text();
-    path=ui->path->text();
-    if(!groupname.isEmpty()&&!path.isEmpty()){
-        if(sqlConnection->insertGroup(FtpGroup(groupname,path,"",""))){
-            qDebug()<<"添加用户组成功";
-            //发送刷新信号
-            emit refresh();
-            cancel();
-        }
-    }
+{   //进行提示信息的初始化
+    QPalette pe;
+     pe.setColor(QPalette::WindowText,Qt::red);
+      ui->inform->setPalette(pe);
+       ui->inform2->setPalette(pe);
+       ui->inform->setText("");
+       ui->inform2->setText("");
+        groupname=ui->groupname->text();
+         path=ui->path->text();
+          if(!groupname.isEmpty()&&!path.isEmpty()){
+              if(sqlConnection->insertGroup(FtpGroup(groupname,path,"",""))){
+                  qDebug()<<"添加用户组成功";
+                  //发送刷新信号
+                  emit refresh();
+                  cancel();
+              }
+              else{
+                  ui->inform->setText("该用户组已存在！");
+              }
+          }
+          else {
+              if(groupname.isEmpty()){
+                  ui->inform->setText("请填写用户名！");
+              }
+
+
+              if(path.isEmpty()){
+
+                  ui->inform2->setText("请选择路径！");
+              }
+          }
 
 }
 void NewGroupDialog::cancel()
