@@ -271,7 +271,7 @@ bool FtpSqlConnection::updateGroupFileAndDirAccess(int id, QString file, QString
  * @return bool
 */
 bool FtpSqlConnection::insertGroup(FtpGroup group){
-    if(!hasGroupByName(group.getName())){
+    if(!hasGroupByName(group.getName())){//只有在用户组名不存在的情况下才能新建用户组
         QString sql="insert into ftpgroup(id,name,path,file,directory) values(null,:name,:path,:file,:directory);";
         QSqlQuery sqlQuery;
         sqlQuery.prepare(sql);
