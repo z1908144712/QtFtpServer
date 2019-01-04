@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>编辑用户组</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -44,42 +44,25 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QWidget" name="widget" native="true">
-        <widget class="QLabel" name="label_2">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>10</y>
-           <width>151</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>请输入修改后用户组的名字</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="groupname">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>40</y>
-           <width>95</width>
-           <height>20</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="inform">
-         <property name="geometry">
-          <rect>
-           <x>120</x>
-           <y>40</y>
-           <width>111</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>请输入修改后用户组的名字</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="groupname"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="inform">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>

@@ -85,7 +85,8 @@ void EditGroupDialog::deleteuser(){
         QMessageBox::warning(this,"错误","修改失败！");
     }else{  //刷新用户界面
         ui->deleteuser->setEnabled(false);
-    showUserListInGroup();
+        showUserListInGroup();
+        emit refresh();
     }
 }
 void EditGroupDialog::refresh_user(){

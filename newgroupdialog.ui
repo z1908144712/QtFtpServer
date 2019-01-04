@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>新建用户组</string>
   </property>
   <widget class="QLineEdit" name="groupname">
    <property name="geometry">
