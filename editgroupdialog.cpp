@@ -30,20 +30,17 @@ EditGroupDialog::~EditGroupDialog()
 }
 
 void EditGroupDialog::confirm(){
-  //将修改后的值保存至当前对象
-    ftpgroup.setName(ui->groupname->text());
-    ftpgroup.setPath(ui->path->text());
     if(sqlConnection->hasGroupByName(ftpgroup.getName())){
-        QPalette pe;
-         pe.setColor(QPalette::WindowText,Qt::red);
-        ui->inform->setPalette(pe);
-        ui->inform->setText("用户组名已存在！");
+        ui->groupname->setText(ftpgroup.getName());
+        QMessageBox::warning(this,"错误","用户组名已存在！");
     }
     else{
+        //将修改后的值保存至当前对象
+         ftpgroup.setName(ui->groupname->text());
+         ftpgroup.setPath(ui->path->text());
         if(sqlConnection->updateGroupBasic(ftpgroup)){
             emit refresh();
             cancel();
-
         }
 
     }
@@ -96,5 +93,8 @@ void EditGroupDialog::cancel(){
     this->close();
 }
 void EditGroupDialog::findfile(){
-    ui->path->setText(QFileDialog::getExistingDirectory(this,"选取","."));
+    QString path=QFileDialog::getExistingDirectory(this,"选取",".");
+    if(!path.isEmpty()){
+        ui->path->setText(path);
+    }
 }
