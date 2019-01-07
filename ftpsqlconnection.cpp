@@ -97,7 +97,7 @@ bool FtpSqlConnection::updateUserBasic(FtpUser ftpUser){
     QString sql="update ftpuser set ";
     QSqlQuery sqlQuery;
     if(user.getName()!=ftpUser.getName()){
-        sql+="username=:username,";
+        sql+="name=:name,";
     }
     if(user.getPassword()!=ftpUser.getPassword()){
         sql+="password=:password,";
@@ -112,7 +112,7 @@ bool FtpSqlConnection::updateUserBasic(FtpUser ftpUser){
     sql+=" where id=:id;";
     sqlQuery.prepare(sql);
     if(user.getName()!=ftpUser.getName()){
-        sqlQuery.bindValue(":username",ftpUser.getName());
+        sqlQuery.bindValue(":name",ftpUser.getName());
     }
     if(user.getPassword()!=ftpUser.getPassword()){
         sqlQuery.bindValue(":password",ftpUser.getPassword());
@@ -124,6 +124,7 @@ bool FtpSqlConnection::updateUserBasic(FtpUser ftpUser){
         sqlQuery.bindValue(":path",ftpUser.getPath());
     }
     sqlQuery.bindValue(":id",ftpUser.getId());
+    qDebug()<<sqlQuery.executedQuery();
     if(!sqlQuery.exec()){
         qDebug()<<sqlQuery.lastError();
         return false;
@@ -143,7 +144,6 @@ bool FtpSqlConnection::updateUserFileAccess(int id, QString file){
     sqlQuery.bindValue(":file",file);
     sqlQuery.bindValue(":id",id);
     if(!sqlQuery.exec()){
-        qDebug()<<sqlQuery.lastError();
         return false;
     }else{
         return true;

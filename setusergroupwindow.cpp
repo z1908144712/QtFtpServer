@@ -389,7 +389,7 @@ void SetUserGroupWindow::saveGroupAccess(){
         if(!sqlConnection->updateGroupFileAndDirAccess(ftpGroup.getId(),group_file_access,group_dir_access)){
             QMessageBox::warning(this,"错误","修改失败！");//目录和文件权限都修改
         }
-    }else if(group_file_access!=ftpUser.getFile()){
+    }else if(group_file_access!=ftpGroup.getFile()){
         if(!sqlConnection->updateGroupFileAccess(ftpGroup.getId(),group_file_access)){
             QMessageBox::warning(this,"错误","修改失败！");//修改文件权限
         }

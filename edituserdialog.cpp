@@ -72,7 +72,9 @@ void EditUserDialog::confirm(){
             QMessageBox::warning(this,"错误","两次输入的密码不一致！");
             return;
         }else{
-            password1=FtpCrypto::cryptopassword(password1);
+            if(password1!=ftpUser.getPassword()){
+                password1=FtpCrypto::cryptopassword(password1);
+            }
         }
         if(username!=ftpUser.getName()||password1!=ftpUser.getPassword()||group!=ftpgroup||path!=ftpUser.getPath()){
             if(username!=ftpUser.getName()){
