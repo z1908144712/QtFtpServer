@@ -115,7 +115,11 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLineEdit" name="path"/>
+           <widget class="QLineEdit" name="path">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="findpath">
