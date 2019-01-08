@@ -30,8 +30,9 @@ EditGroupDialog::~EditGroupDialog()
 }
 
 void EditGroupDialog::confirm(){
-    if(sqlConnection->hasGroupByName(ftpgroup.getName())){
-        ui->groupname->setText(ftpgroup.getName());
+    QString groupname=ui->groupname->text();
+    if(sqlConnection->hasGroupByName(groupname)&&QString::compare(groupname,ftpgroup.getName())!=0){
+       // ui->groupname->setText(ftpgroup.getName());
         QMessageBox::warning(this,"错误","用户组名已存在！");
     }
     else{
